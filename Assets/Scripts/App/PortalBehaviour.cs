@@ -58,28 +58,21 @@ public class PortalBehaviour : MonoBehaviour
 
     float currSpeed;
 
-
-    Action<PortalBehaviour> portalStarted;
-    Action<PortalBehaviour> portalInteractedWith;
-    Action<PortalBehaviour> portalEnd;
-
-    //Count portal length
-    public PortalBehaviour()
-    {
-        
-    }
+    Action<PortalBehaviour> onPortalStarted;
+    Action<PortalBehaviour> onPortalInteractedWith;
+    Action<PortalBehaviour> onPortalEnd;
 
     private void Awake()
     {
         portalGenerator = FindObjectOfType<PortalGenerator>();
-        portalStarted += portalGenerator.PortalGenerated;
-        portalInteractedWith += portalGenerator.PortalInteractedWith;
-        portalEnd += portalGenerator.PortalEnd;
+        onPortalStarted += portalGenerator.OnPortalGenerated;
+        onPortalInteractedWith += portalGenerator.OnPortalInteractedWith;
+        onPortalEnd += portalGenerator.OnPortalEnd;
         transform = GetComponent<Transform>();
         currSpeed = scalingSpeed;
     }
-    // Start is called before the first frame update
-    void Start()
+
+    private void Start()
     {
        //var mat = portalParsys.GetComponent<Renderer>().material;
       //  mat.DOFloat(0f, "_AlphaM", 3f);
@@ -90,8 +83,12 @@ public class PortalBehaviour : MonoBehaviour
         int created = Time.frameCount;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
+    {
+        onPortalStarted.Invoke(this);
+    }
+
+    private  void Update()
     {
         if (isPortalAlive && lifetime.IsRunning)
         {
@@ -111,7 +108,32 @@ public class PortalBehaviour : MonoBehaviour
         }
     }
 
-    void OnPortalTouch()
+    private void OnMouseDown()
+    {
+        //StartScalingSequence();
+
+        ps = this.gameObject.GetComponent(typeof(ParticleSystem)) as ParticleSystem;
+        //var em = ps.emission;
+        //em.enabled = false;
+        GenerateCoordinates.showNext = true;
+        isTouching = true;
+
+    }
+
+    private void OnMouseUp()
+    {
+        isTouching = false;
+        //StopShakeEffect();
+    }
+
+    private void OnDestroy()
+    {
+        StopStopwatch();
+        onPortalInteractedWith -= portalGenerator.OnPortalInteractedWith;
+
+    }
+
+    private void OnPortalTouch()
     {
         //  currSpeed = currSpeed  Time.deltaTime;
         // if (startTrans == new Vector3(0, 0, 0)) { startTrans = portalParticles.transform.localScale; }
@@ -125,73 +147,35 @@ public class PortalBehaviour : MonoBehaviour
         if (finishScale.z - portalParticles.transform.localScale.z < 0.1f)
         {
             isPortalInteracted = true;
-            portalInteractedWith.Invoke(this);
+            onPortalInteractedWith.Invoke(this);
             StartShakeEffect();
         }
 
     }
 
-    private void OnEnable()
-    {
-        portalStarted.Invoke(this);
-    }
-
-    private void OnDestroy()
-    {
-        StopStopwatch();
-        portalInteractedWith -= portalGenerator.PortalInteractedWith;
-
-    }
-
-    private void OnMouseDown()
-    {
-        //StartScalingSequence();
-
-        ps = this.gameObject.GetComponent(typeof(ParticleSystem)) as ParticleSystem;
-        //var em = ps.emission;
-        //em.enabled = false;
-        GenerateCoordinates.showNext = true;
-        isTouching = true;
-        
-    }
-
-    private void OnMouseUp()
-    {
-        isTouching = false;
-        //StopShakeEffect();
-    }
-
-    void StartStopwatch()
+    private void StartStopwatch()
     {
         lifetime.Reset();
         lifetime.Start();
     }
 
-    void StopStopwatch()
+    private void StopStopwatch()
     {
         lifetime.Stop();
     }
 
-    void PortalEnd()
+    private void PortalEnd()
     {
-        portalEnd.Invoke(this);
+        onPortalEnd.Invoke(this);
         DestroyImmediate(gameObject);
     }
 
-    void GetRandomPortalTime()
+    public void InitializePortal(Vector3 position)
     {
-        portalLifetime =  UnityEngine.Random.Range(minPortalTime, maxPortalTime);
-    }
-
-   
-
-    public void InstantiatePortal(Vector3 position)
-    {
-        GetRandomPortalTime();
+        portalLifetime = GetRandomPortalTime();
         portalPosition = position;
         isPortalAlive = true;
-        StartStopwatch();
-        GameObject portal = Instantiate(MainApp.Instance.portalPrefab, position, Quaternion.identity);
+        StartStopwatch();   
         psinObject.Play();
         portalParticles.transform.localScale = Vector3.zero;
         //if (scaleMaskSeparately)
@@ -201,13 +185,11 @@ public class PortalBehaviour : MonoBehaviour
         //return portal;
     }
 
-    public void StartScalingSequence()
+
+    public Sequence GetScalingSequence()
     {
-
-        print("start scaling sequence ");
-
         Sequence seq = Utility.NewSequence();
-        
+
         psinObject.gameObject.SetActive(false);
         psTwo.gameObject.SetActive(false);
         var mat = portalParsys.GetComponent<Renderer>().material;
@@ -222,19 +204,23 @@ public class PortalBehaviour : MonoBehaviour
         //{
         //    seq.Append(transform.DOScale(finishScale, scalingTime));
         //}
-        seq.Play();
+
+        return seq;
     }
 
-    void StartShakeEffect()
+    private void StartShakeEffect()
     {
         //vibrate effect
         isShaking = true;
     }
 
-
-    void StopShakeEffect()
+    private void StopShakeEffect()
     {
         isShaking = false;
+    }
 
+    private float GetRandomPortalTime()
+    {
+        return UnityEngine.Random.Range(minPortalTime, maxPortalTime);
     }
 }

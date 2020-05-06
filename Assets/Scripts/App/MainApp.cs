@@ -1,109 +1,92 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Diagnostics;
-using DG.Tweening;
 using ToJ;
 
 public class MainApp : TGlobalSingleton<MainApp>
 {
 
-    public float gameLength = 180f;
-    public AudioManager audioManager;
+	public float gameLength = 180f;
 
+	public AudioManager audioManager;
+	public Mask maskForUpdate;
+	public PortalGenerator portalGenerator;
+	public BackgroundManager backgroundManager;
 
-    public GameObject portalPrefab;
+	//Count time length
+	private Stopwatch stopwatch = new Stopwatch();
+	private bool stopwatchRunning;
 
-    public PortalGenerator portalGenerator;
-    BackgroundControl backgroundControl;
+	// DEBUG
+	public double elapsedTime;
 
-    public Mask maskForUpdate;
+	private void Update()
+	{
+		if (stopwatch.IsRunning && stopwatchRunning)
+		{
+			elapsedTime = stopwatch.Elapsed.TotalSeconds;
+			// update game length gui
+			//imageFill = Mathf.Lerp(0f, 1f, Mathf.Clamp01((float)stopwatch.Elapsed.TotalSeconds / hoverTime));
+			//image.fillAmount = imageFill;
+			MainUIController.Instance.UpdateGameTime(((int)gameLength - stopwatch.Elapsed.Seconds).ToString());
 
-    //Count time length
-    Stopwatch stopwatch = new Stopwatch();
-    bool stopwatchRunning;
+			if (stopwatch.Elapsed.TotalSeconds > gameLength)
+			{
+				//End game, time expired
+				stopwatchRunning = false;
+				EndGame();
+			}
+		}
+	}
 
-    [HideInInspector]
-    public bool timeSetuped = false;
+	public void StartGame()
+	{
+		MainUIController.Instance.ShowGameplayUI();
+		StartStopwatch();
+		portalGenerator.GeneratePortalAfterRandomTime();
+	}
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        backgroundControl = GetComponent<BackgroundControl>();   
-    }
+	public void EndGame()
+	{
+		StopStopwatch();
+		MainUIController.Instance.ShowEndScreen();
+	}
 
-    void Update()
-    {
-        if (stopwatch.IsRunning && stopwatchRunning)
-        {
-            UnityEngine.Debug.Log(stopwatch.Elapsed.TotalSeconds);
-            // update game length gui
-            //imageFill = Mathf.Lerp(0f, 1f, Mathf.Clamp01((float)stopwatch.Elapsed.TotalSeconds / hoverTime));
-            //image.fillAmount = imageFill;
-                MainUIController.Instance.UpdateGameTime(((int)gameLength - stopwatch.Elapsed.Seconds).ToString());
+	public void SetGameLength(float length)
+	{
+		gameLength = length * 60f;
+	}
 
-            if (stopwatch.Elapsed.TotalSeconds > gameLength)
-            {
-                //End game, time expired
-                stopwatchRunning = false;
-                EndGame();
-            }
-        }
-    }
+	public void StartBGTransition()
+	{
+		backgroundManager.SwitchBackgroundsPosition();
+	}
 
+	public void UpdateMask()
+	{
+		print("Mask refreshed!");
+		maskForUpdate.ScheduleFullMaskRefresh();
+	}
 
+	private void StartStopwatch()
+	{
+		stopwatch.Reset();
+		stopwatch.Start();
+		stopwatchRunning = true;
+	}
 
-    public void StartGame()
-    {
-        MainUIController.Instance.ShowGameplayUI();
-        StartStopwatch();
-        portalGenerator.GetRandomPortalTime();
-    }
+	private void StopStopwatch()
+	{
+		stopwatch.Stop();
+		stopwatchRunning = false;
+	}
 
-    public void PauseGame()
-    {
-        stopwatch.Stop();
-    }
+	//public void PauseGame()
+	//{
+	//    stopwatch.Stop();
+	//}
 
-    public void ResumeGame()
-    {
-        stopwatch.Start();
-    }
-
-    public void EndGame()
-    {
-        StopStopwatch();
-        MainUIController.Instance.ShowEndScreen();
-    }
-
-    void StartStopwatch()
-    {
-        stopwatch.Reset();
-        stopwatch.Start();
-        stopwatchRunning = true;
-    }
-
-    void StopStopwatch()
-    {
-        stopwatch.Stop();
-        stopwatchRunning = false;
-    }
-
-    public void SetGameLength(float length)
-    {
-        gameLength = length * 60f;
-        timeSetuped = true;
-    }
-
-    public void StartBGTransition()
-    {
-        backgroundControl.MoveSecondaryToPrimary();
-    }
-
-    public void UpdateMask()
-    {
-        print("Mask refreshed!");
-        maskForUpdate.ScheduleFullMaskRefresh();
-    }
-
+	//public void ResumeGame()
+	//{
+	//    stopwatch.Start();
+	//}
 }
