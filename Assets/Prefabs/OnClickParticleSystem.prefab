@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5832501326585991921}
   - component: {fileID: 5832501326577485777}
   m_Layer: 0
-  m_Name: onclick1
+  m_Name: OnClickParticleSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ ParticleSystem:
   serializedVersion: 6
   lengthInSec: 3.5
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 1
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}

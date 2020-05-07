@@ -118,9 +118,9 @@
     <Compile Include="Assets\ParticleDistortTexture\Scripts\toggleControl.cs" />
     <Compile Include="Assets\Scripts\App\BackgroundManager.cs" />
     <Compile Include="Assets\Scripts\App\MainApp.cs" />
-    <Compile Include="Assets\Scripts\App\Onclick.cs" />
     <Compile Include="Assets\Scripts\App\PortalController.cs" />
     <Compile Include="Assets\Scripts\App\PortalGenerator.cs" />
+    <Compile Include="Assets\Scripts\App\TouchParticleController.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioManager.cs" />
     <Compile Include="Assets\Scripts\BackgroundController.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovingController.cs" />
