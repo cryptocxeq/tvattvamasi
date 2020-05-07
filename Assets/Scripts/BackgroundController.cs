@@ -48,15 +48,18 @@ public class BackgroundController : MonoBehaviour
 	public GeneratorParams generatorParams;
 
 	public Transform starsContent;
+	public Transform alphaTextures;
 
 	private Queue<NebulaCache> nebulaPool;
 	private NebulaCache[] allNebulas;
 	private List<NebulaCache> activeNebulas;
 	private ParticleSystemRenderer[] starsRenderers;
+	private MeshRenderer[] alphaTexturesRenderers;
 
 	private void Awake()
 	{
 		starsRenderers = starsContent.GetComponentsInChildren<ParticleSystemRenderer>();
+		alphaTexturesRenderers = alphaTextures.GetComponentsInChildren<MeshRenderer>();
 		if (generatorParams.generateNebulas)
 			InitialzeNebulaPool();
 		if (generatorParams.generateBackground)
@@ -100,6 +103,8 @@ public class BackgroundController : MonoBehaviour
 			SetNebulaAlphaMashShader();
 		for (int i = 0; i < starsRenderers.Length; i++)
 			starsRenderers[i].material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
+		for (int i = 0; i < alphaTexturesRenderers.Length; i++)
+			alphaTexturesRenderers[i].material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
 	}
 
 	private void SetUnlitShaders()
@@ -110,6 +115,8 @@ public class BackgroundController : MonoBehaviour
 			SetNebulaUnlitShader();
 		for (int i = 0; i < starsRenderers.Length; i++)
 			starsRenderers[i].material.shader = Shader.Find("Mobile/Particles/Additive");
+		for (int i = 0; i < alphaTexturesRenderers.Length; i++)
+			alphaTexturesRenderers[i].material.shader = Shader.Find("Unlit/Transparent");
 	}
 
 	#region Nebula

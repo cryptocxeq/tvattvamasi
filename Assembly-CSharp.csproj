@@ -136,10 +136,6 @@
     <Compile Include="Assets\Scripts\cam.cs" />
     <Compile Include="Assets\Scripts\gyro.cs" />
     <Compile Include="Assets\Scripts\maskscript.cs" />
-    <Compile Include="Assets\Scripts\me.cs" />
-    <Compile Include="Assets\Scripts\rdize.cs" />
-    <Compile Include="Assets\Scripts\runscript.cs" />
-    <Compile Include="Assets\Scripts\script.cs" />
     <Compile Include="Assets\Scripts\setgamelength.cs" />
     <Compile Include="Assets\Shared\Ramps\Runtime\RampAsset.cs" />
     <Compile Include="Assets\Shared\Scripts\AdjustTimeScale.cs" />
