@@ -64,16 +64,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Alpha Masking\Editor\MaskEditor.cs" />
-    <Compile Include="Assets\BlendModes\Editor\BlendModeEffectEditor.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ExtensionFile.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ExtensionManager.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ExtensionPackage.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ExtensionSources.cs" />
-    <Compile Include="Assets\BlendModes\Editor\PackagePath.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ShaderPropertiesList.cs" />
-    <Compile Include="Assets\BlendModes\Editor\ShaderResourcesEditor.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\BlendModeEffectEditor.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ExtensionFile.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ExtensionManager.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ExtensionPackage.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ExtensionSources.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\PackagePath.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ShaderPropertiesList.cs" />
+    <Compile Include="Assets\Modules\BlendModes\Editor\ShaderResourcesEditor.cs" />
+    <Compile Include="Assets\Modules\Warp_Effect\Assets\Editor\WarpEffectEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\MinMaxDrawer.cs" />
     <Compile Include="Assets\Shared\Ramps\Editor\RampAssetEditor.cs" />
-    <Compile Include="Assets\Warp_Effect\Assets\Editor\WarpEffectEditor.cs" />
     <Reference Include="UnityEditor.TestRunner">
       <HintPath>C:/Projects/tvattvamasi/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
@@ -390,10 +391,10 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
-      <HintPath>C:/Projects/tvattvamasi/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+      <HintPath>C:/Projects/tvattvamasi/Assets/Modules/Demigiant/DOTween/DOTween.dll</HintPath>
     </Reference>
     <Reference Include="DOTweenEditor">
-      <HintPath>C:/Projects/tvattvamasi/Assets/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
+      <HintPath>C:/Projects/tvattvamasi/Assets/Modules/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>C:/Projects/tvattvamasi/Library/PackageCache/com.unity.render-pipelines.core@7.3.1/Editor/ShaderGenerator/ICSharpCode.NRefactory.dll</HintPath>

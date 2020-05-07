@@ -5,30 +5,78 @@ using UnityEngine;
 
 public class PortalGenerator : MonoBehaviour
 {
-	public float minTimeToGeneratePortal;
-	public float maxTimeToGeneratePortal;
+	[System.Serializable]
+	public class GeneratorParams
+	{
+		[MinMax(1, 10, ShowEditRange = true)]
+		public Vector2 portalLifetime = new Vector2(5, 15);
+		[MinMax(1, 10, ShowEditRange = true)]
+		public Vector2 timeToGeneratePortal = new Vector2(4, 8);
+		[MinMax(0, 1, ShowEditRange = true)]
+		public Vector2 portalSpawnRangeX = new Vector2(0, 1);
+		[MinMax(0, 1, ShowEditRange = true)]
+		public Vector2 portalSpawnRangeY = new Vector2(0, 1);
 
-	public Vector2 minPortalSpawnPoint;
-	public Vector2 maxPortalSpawnPoint;
+		public float minPortalDistance = 1;
+		public int numberOfPortalsToTransitionToNextScene = 4;
+	}
 
-	public float minPortalDistance = 1;
-	public int numberOfPortalsToTransitionToNextScene = 4;
-
-	public Vector3 maskStartScale;
-
-	public float zMaskValue;
-
-	public PortalBehaviour portalPrefab;
-	public GameObject maskObjectPrefab;
+	public GeneratorParams generatorParams;
 	public Transform maskParent;
+	public Transform maskObjectPrefab;
+	public PortalController portalPrefab;
+	public Transform portalParent;
+	public ContactFilter2D portalContactFilter;
 
-	List<PortalBehaviour> portals = new List<PortalBehaviour>();
-	List<PortalBehaviour> interactedPortals = new List<PortalBehaviour>();
+	private List<PortalController> activePortals = new List<PortalController>();
+	private Queue<PortalController> portalsPool;
+	private int completedPortalsCount;
+	private List<RaycastHit2D> raycastHit = new List<RaycastHit2D>();
+
+	private void Awake()
+	{
+		int maxNumberOfPortals = generatorParams.numberOfPortalsToTransitionToNextScene * 2;
+		portalsPool = new Queue<PortalController>(maxNumberOfPortals);
+		for (int i = 0; i < maxNumberOfPortals; i++)
+		{
+			PortalController portal = Instantiate(portalPrefab, portalParent);
+			Transform portalMask = Instantiate(maskObjectPrefab, maskParent);
+			portal.gameObject.SetActive(false);
+			portal.InitializePortal(portalMask);
+			portalsPool.Enqueue(portal);
+		}
+	}
+
+	private void Update()
+	{
+		Vector3 inputPosition;
+		bool inputPressed = false;
+
+#if UNITY_ANDROID || UNITY_IOS
+		if (Input.touchCount > 0)
+		{
+			inputPressed = true;
+			inputPosition = Input.touches[0].position;
+		}
+#else
+		inputPosition = Input.mousePosition;
+		inputPressed = Input.GetMouseButton(0);
+#endif
+		if (inputPressed)
+		{
+
+			if (Physics2D.Raycast(Camera.main.ScreenToWorldPoint(inputPosition), Vector2.zero, portalContactFilter, raycastHit) > 0)
+			{
+				PortalController pc = raycastHit[0].collider.GetComponent<PortalController>();
+				if (pc != null)
+					pc.OnPortalTouch();
+			}
+		}
+	}
 
 	public void GeneratePortalAfterRandomTime()
 	{
-		float timeToGenerateNewPortal = UnityEngine.Random.Range(minTimeToGeneratePortal, maxTimeToGeneratePortal);
-		StartCoroutine(WaitAndCreateNewPortal(timeToGenerateNewPortal));
+		StartCoroutine(WaitAndCreateNewPortal(GetRandomPortalSpawnTime()));
 	}
 
 	IEnumerator WaitAndCreateNewPortal(float timeToWait)
@@ -39,80 +87,90 @@ public class PortalGenerator : MonoBehaviour
 
 	public void GeneratePortal()
 	{
-		if (portals.Count < numberOfPortalsToTransitionToNextScene)
+		if (portalsPool.Count <= 0)
 		{
-			Vector3 positionToSpawn = ReturnRandomPortalSpawnPoint();
-			/*GameObject newPort = */
-
-			PortalBehaviour portal = Instantiate(portalPrefab, positionToSpawn, Quaternion.identity);
-			portal.InitializePortal(positionToSpawn);
-			//portals.Add(newPort.GetComponent<PortalBehaviour>()); 
+			Debug.LogError("Not enough portals to spawn! Increase the pool size.");
+		}
+		else
+		{
+			Vector3 positionToSpawn = GetRandomPortalSpawnPoint();
+			float lifetime = GetRandomLifetime();
+			PortalController portal = portalsPool.Dequeue();
+			portal.gameObject.SetActive(true);
+			activePortals.Add(portal);
+			portal.StartPortal(positionToSpawn, lifetime);
+			Debug.Log("Portal generated at " + positionToSpawn.ToString(), portal);
 		}
 	}
 
-	public void OnPortalGenerated(PortalBehaviour portal)
+	public void OnPortalCompleted(PortalController portal)
 	{
-		if (!portals.Contains(portal))
-		{
-			portals.Add(portal);
-			CreateMaskOnPosition(new Vector3(portal.portalParticles.transform.position.x, portal.portalParticles.transform.position.y, zMaskValue), portal);
-			print("generated portal on position " + portal.portalPosition.ToString());
-		}
-	}
+		Debug.Log("portal completed on position" + portal.transform.position.ToString(), portal);
 
-	public void OnPortalInteractedWith(PortalBehaviour portal)
-	{
-		if (!interactedPortals.Contains(portal))
+		completedPortalsCount++;
+		if (completedPortalsCount >= generatorParams.numberOfPortalsToTransitionToNextScene)
 		{
-			print("interacted with portal on position " + portal.portalPosition.ToString());
-			interactedPortals.Add(portal);
-			GeneratePortalAfterRandomTime();
-		}
-		if (interactedPortals.Count >= numberOfPortalsToTransitionToNextScene)
-		{		
 			StartScalingSequence();
 		}
+		else
+		{
+			GeneratePortalAfterRandomTime();
+		}
 	}
 
-	public void OnPortalEnd(PortalBehaviour portal)
+	public void OnPortalRemoved(PortalController portal)
 	{
-		print("portal ended on position " + portal.portalPosition.ToString());
-		portals.Remove(portal);
-		interactedPortals.Remove(portal);
-		Destroy(portal.maskObject);
+		Debug.Log("portal removed from position " + portal.transform.position.ToString(), portal);
+
+		portal.gameObject.SetActive(false);
+		portalsPool.Enqueue(portal);
+		activePortals.Remove(portal);
 	}
 
 	public void StartScalingSequence()
 	{
-		print("start scaling sequence ");
+		Debug.Log("start scaling sequence ");
 
 		Sequence portalSeq = Utility.NewSequence();
-		for (int i = 0; i < portals.Count; i++)
-			portalSeq.Join(portals[i].GetScalingSequence());
+		for (int i = 0; i < activePortals.Count; i++)
+			portalSeq.Join(activePortals[i].GetScalingSequence());
 		portalSeq.AppendCallback(MainApp.Instance.StartBGTransition);
+		portalSeq.AppendCallback(GeneratePortalAfterRandomTime);
 		portalSeq.Play();
-		portals.Clear();
-		interactedPortals.Clear();
+
+		completedPortalsCount = 0;
 	}
 
-	private void CreateMaskOnPosition(Vector3 position, PortalBehaviour portal)
+	private Vector3 GetRandomPortalSpawnPoint()
 	{
-		GameObject port = Instantiate(maskObjectPrefab, position, Quaternion.identity, maskParent);
-		port.transform.localPosition = new Vector3(port.transform.localPosition.x, port.transform.localPosition.y, zMaskValue);
-		port.transform.localScale = maskStartScale;
-		portal.maskObject = port;
-	}
+		Vector3 pos = GetRandomPosition();
+		int it = 0;
 
-	private void ScaleMaskUp(PortalBehaviour portal)
-	{
-
-	}
-
-	private bool IsThisGoodPositionToSpawn(Vector3 position)
-	{
-		for (int i = 0; i < portals.Count; i++)
+		while (!IsThisGoodPositionToSpawn(pos) && it < 10)
 		{
-			if (Vector3.Distance(portals[i].portalPosition, position) < minPortalDistance)
+			pos = GetRandomPosition();
+			if (it >= 9)
+				Debug.LogError("ERROR: There is no suitable place to place portal, lower your minPortalDistance");
+			it++;
+		}
+		return pos;
+	}
+
+	private Vector3 GetRandomPosition()
+	{
+		float randomViewportX = Random.Range(generatorParams.portalSpawnRangeX.x, generatorParams.portalSpawnRangeX.y);
+		float randomViewportY = Random.Range(generatorParams.portalSpawnRangeY.x, generatorParams.portalSpawnRangeY.y);
+
+		Vector3 result = Camera.main.ViewportToWorldPoint(new Vector3(randomViewportX, randomViewportY));
+		result.z = 0f;
+		return result;
+	}
+
+	private bool IsThisGoodPositionToSpawn(Vector3 targetPosition)
+	{
+		for (int i = 0; i < activePortals.Count; i++)
+		{
+			if (Vector2.Distance(activePortals[i].transform.localPosition, targetPosition) < generatorParams.minPortalDistance)
 			{
 				return false;
 			}
@@ -121,27 +179,13 @@ public class PortalGenerator : MonoBehaviour
 		return true;
 	}
 
-
-	Vector3 ReturnRandomPortalSpawnPoint()
+	private float GetRandomLifetime()
 	{
-		Vector3 pos = ReturnRandomPosition();
-		int it = 0;
-
-		while (!IsThisGoodPositionToSpawn(pos) && it < 10)
-		{
-			pos = ReturnRandomPosition();
-			if (it == 9)
-				UnityEngine.Debug.LogError("ERROR: There is no suitable place to place portal, lower your minPortalDistance");
-			it++;
-		}
-		return pos;
+		return Random.Range(generatorParams.portalLifetime.x, generatorParams.portalLifetime.y);
 	}
 
-	Vector3 ReturnRandomPosition()
+	private float GetRandomPortalSpawnTime()
 	{
-		float randomX = UnityEngine.Random.Range(minPortalSpawnPoint.x, maxPortalSpawnPoint.x);
-		float randomY = UnityEngine.Random.Range(minPortalSpawnPoint.y, maxPortalSpawnPoint.y);
-
-		return new Vector3(randomX, randomY, -1f);
+		return Random.Range(generatorParams.timeToGeneratePortal.x, generatorParams.timeToGeneratePortal.y);
 	}
 }

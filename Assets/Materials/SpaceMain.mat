@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: SpaceMain
-  m_Shader: {fileID: 4800000, guid: 728c0e664f8bc78468d36dcb0c49f8d5, type: 3}
+  m_Shader: {fileID: 4800000, guid: 95ce4da6af347e04ab494d238f27ab29, type: 3}
   m_ShaderKeywords: _ENABLED_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -36,8 +36,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: beaba9bf06ba8614d954e150ccf8a44d, type: 3}
+        m_Scale: {x: 1, y: 0.25}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
