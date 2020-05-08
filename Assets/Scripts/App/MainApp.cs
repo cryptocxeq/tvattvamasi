@@ -63,7 +63,6 @@ public class MainApp : TGlobalSingleton<MainApp>
 	public void StartNewGame(int duration)
 	{
 		ResumeGame();
-		introManager.HideIntro();
 		isInfinite = false;
 		stopwatch.Reset();
 		stopwatch.Start();

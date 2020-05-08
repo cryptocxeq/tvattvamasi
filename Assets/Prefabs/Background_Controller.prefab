@@ -322,6 +322,36 @@ MonoBehaviour:
       backgroundTextures:
       - {fileID: 2800000, guid: beaba9bf06ba8614d954e150ccf8a44d, type: 3}
       spaceMainMovementSpeed: 0.01
+    generateAudio: 1
+    audioParams:
+      audioSource: {fileID: 4145498644086467355}
+      audioClips:
+      - {fileID: 8300000, guid: ce9a76fce9658064ea50f7e00566eefc, type: 3}
+      audioFadeDuration: 3
+      audioFadeCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
   starsContent: {fileID: 2586837785387111665}
   alphaTextures: {fileID: 1002268188019412760}
 --- !u!1 &195527195747540295
@@ -687,7 +717,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3515665994172503862
 Transform:
   m_ObjectHideFlags: 0
@@ -711,11 +741,11 @@ AudioSource:
   m_GameObject: {fileID: 1356386266313893987}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: 01e15b7010322594d9930239ef0cc78b,
+  OutputAudioMixerGroup: {fileID: 1947227628266491083, guid: 01e15b7010322594d9930239ef0cc78b,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: ce9a76fce9658064ea50f7e00566eefc, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

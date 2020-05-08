@@ -5,8 +5,9 @@ using DG.Tweening;
 public class PortalController : MonoBehaviour
 {
 	public float touchScalingDuration = 3f;
-	public float transitionDuration = 4f;
+	public float maskTransitionDuration = 4f;
 	public float maskTransitionFinalScale = 60f;
+	public float portalTransitionDuration = 2f;
 	public float portalTransitionFinalScale = 20f;
 
 	[MinMax(0, 10, ShowEditRange = true)]
@@ -113,9 +114,9 @@ public class PortalController : MonoBehaviour
 		Sequence seq = Utility.NewSequence();
 
 		psinObject.gameObject.SetActive(false);
-		seq.Append(portalMask.transform.DOScale(maskTransitionFinalScale, transitionDuration))
-			.Join(portalParticlesParent.transform.DOScale(portalTransitionFinalScale, transitionDuration))
-			.Join(portalHaloRenderer.material.DOFloat(0f, "_AlphaM", transitionDuration))
+		seq.Append(portalMask.transform.DOScale(maskTransitionFinalScale, maskTransitionDuration))
+			.Join(portalParticlesParent.transform.DOScale(portalTransitionFinalScale, maskTransitionDuration))
+			.Join(portalHaloRenderer.material.DOFloat(0f, "_AlphaM", portalTransitionDuration))
 			.AppendCallback(RemovePortal);
 
 		return seq;

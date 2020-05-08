@@ -12,11 +12,18 @@ public class BackgroundManager : MonoBehaviour
 	{
 		bgFront.transform.localPosition = frontBackgroundPosition;
 		bgFront.InitializeAsFront();
+		bgFront.FadeAudioIn();
 		bgBack.transform.localPosition = backBackgroundPosition;
 		bgBack.InitializeAsBack();
 	}
 
-	public void SwitchBackgrounds()
+	public void OnSwitchBackgroundsStart()
+	{
+		bgBack.FadeAudioIn();
+		bgFront.FadeAudioOut();
+	}
+
+	public void OnSwitchBackgroundsEnd()
 	{
 		bgBack.transform.localPosition = frontBackgroundPosition;
 		bgFront.transform.localPosition = backBackgroundPosition;

@@ -156,6 +156,7 @@ public class PortalGenerator : MonoBehaviour
 
 		if (!isTransitioning)
 		{
+			MainApp.Instance.backgroundManager.OnSwitchBackgroundsStart();
 			Sequence portalSeq = Utility.NewSequence();
 			for (int i = 0; i < activePortals.Count; i++)
 				portalSeq.Join(activePortals[i].GetScalingSequence());
@@ -167,7 +168,7 @@ public class PortalGenerator : MonoBehaviour
 	private void OnScalingSequenceOver()
 	{
 		isTransitioning = false;
-		MainApp.Instance.backgroundManager.SwitchBackgrounds();
+		MainApp.Instance.backgroundManager.OnSwitchBackgroundsEnd();
 		GeneratePortalAfterRandomTime();
 		completedPortalsCount = 0;
 	}

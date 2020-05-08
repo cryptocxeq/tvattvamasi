@@ -164,7 +164,7 @@
     <None Include="Assets\ParticleDistortTexture\ReadMe.txt" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-GrabMasked.shader" />
     <None Include="Assets\Modules\EffectExamples\Misc Effects\Shaders\Respawn.shader" />
-    <None Include="Assets\displaceshader.shader" />
+    <None Include="Assets\Shaders\displaceshader.shader" />
     <None Include="Assets\Shaders\Portal\MobileDistortion.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-OverlayMasked.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-UnifiedGrab.shader" />

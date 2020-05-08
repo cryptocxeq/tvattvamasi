@@ -36,6 +36,18 @@ public class BackgroundController : MonoBehaviour
 
 		public bool generateBackground = true;
 		public BackgroundGeneratorParams backgroundParams;
+
+		[System.Serializable]
+		public class AudioParams
+		{
+			public AudioSource audioSource;
+			public AudioClip[] audioClips;
+			public float audioFadeDuration;
+			public AnimationCurve audioFadeCurve;
+		}
+
+		public bool generateAudio = true;
+		public AudioParams audioParams;
 	}
 
 	public class NebulaCache
@@ -55,6 +67,8 @@ public class BackgroundController : MonoBehaviour
 	private List<NebulaCache> activeNebulas;
 	private ParticleSystemRenderer[] starsRenderers;
 	private MeshRenderer[] alphaTexturesRenderers;
+	private float targetAudioVolume;
+	private float audioFadeTimer;
 
 	private void Awake()
 	{
@@ -64,6 +78,8 @@ public class BackgroundController : MonoBehaviour
 			InitialzeNebulaPool();
 		if (generatorParams.generateBackground)
 			InitializeBackground();
+		if (generatorParams.generateAudio)
+			InitializeAudio();
 		Randomize();
 	}
 
@@ -73,6 +89,8 @@ public class BackgroundController : MonoBehaviour
 			MoveNebulas();
 		if (generatorParams.generateBackground)
 			MoveBackground();
+		if (generatorParams.generateAudio)
+			UpdateAudioVolume();
 	}
 
 	public void Randomize()
@@ -81,6 +99,8 @@ public class BackgroundController : MonoBehaviour
 			RandomizeNebulas();
 		if (generatorParams.generateBackground)
 			RandomizeBackground();
+		if (generatorParams.generateAudio)
+			RandomizeAudio();
 	}
 
 	public void InitializeAsFront()
@@ -212,6 +232,67 @@ public class BackgroundController : MonoBehaviour
 	private void SetBackgroundUnlitShader()
 	{
 		generatorParams.backgroundParams.backgroundRenderer.material.shader = Shader.Find("Unlit/Texture");
+	}
+
+	#endregion
+
+	#region Audio
+
+	private void InitializeAudio()
+	{
+		generatorParams.audioParams.audioSource.volume = 0f;
+	}
+
+	private void RandomizeAudio()
+	{
+		generatorParams.audioParams.audioSource.clip = generatorParams.audioParams.audioClips[Random.Range(0, generatorParams.audioParams.audioClips.Length)];
+	}
+
+	public void FadeAudioOut()
+	{
+		audioFadeTimer = 0f;
+		targetAudioVolume = -0.001f;
+	}
+
+	public void FadeAudioIn()
+	{
+		audioFadeTimer = 0f;
+		targetAudioVolume = 1.001f;
+		generatorParams.audioParams.audioSource.Play();
+	}
+
+	private void UpdateAudioVolume()
+	{
+		if (targetAudioVolume >= 1f)
+		{
+			if (generatorParams.audioParams.audioSource.volume < 1f)
+			{
+				audioFadeTimer += Time.deltaTime;
+				float t = generatorParams.audioParams.audioFadeCurve.Evaluate(audioFadeTimer / generatorParams.audioParams.audioFadeDuration);
+				generatorParams.audioParams.audioSource.volume = Mathf.Lerp(0f, 1f, t);
+			}
+			else
+			{
+				generatorParams.audioParams.audioSource.volume = 1f;
+				audioFadeTimer = 0f;
+			}
+		}
+		else
+		{
+			if (generatorParams.audioParams.audioSource.volume > 0f)
+			{
+				audioFadeTimer += Time.deltaTime;
+				float t = generatorParams.audioParams.audioFadeCurve.Evaluate(audioFadeTimer / generatorParams.audioParams.audioFadeDuration);
+				generatorParams.audioParams.audioSource.volume = Mathf.Lerp(1f, 0f, t);
+			}
+			else
+			{
+				generatorParams.audioParams.audioSource.volume = 0f;
+				audioFadeTimer = 0f;
+				if (generatorParams.audioParams.audioSource.isPlaying)
+					generatorParams.audioParams.audioSource.Stop();
+			}
+		}
 	}
 
 	#endregion

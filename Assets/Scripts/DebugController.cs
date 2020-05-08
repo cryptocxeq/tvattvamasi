@@ -25,6 +25,7 @@ public class DebugController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Alpha2))
 		{
 			MainApp.Instance.StartNewGame(gameLength);
+			MainApp.Instance.introManager.HideIntro();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -35,6 +36,7 @@ public class DebugController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Alpha4))
 		{
 			MainApp.Instance.EndGame();
+			MainApp.Instance.introManager.HideIntro();
 		}
 	}
 }

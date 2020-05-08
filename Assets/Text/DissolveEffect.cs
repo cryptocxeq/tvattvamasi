@@ -164,7 +164,8 @@ public class DissolveEffect : MonoBehaviour
 
 	private void SetIdleParticles()
 	{
-		currentInParticles.Stop();
+		if (currentInParticles != null)
+			currentInParticles.Stop();
 		if (instantiateParticles)
 		{
 			currentIdleParticles = Instantiate(textIdleSystem, gameObject.transform.position, Quaternion.identity);
@@ -199,7 +200,8 @@ public class DissolveEffect : MonoBehaviour
 
 	private void SetDissolveOutParticles(bool slow)
 	{
-		currentIdleParticles.Stop();
+		if (currentIdleParticles != null)
+			currentIdleParticles.Stop();
 
 		if (instantiateParticles)
 		{

@@ -390,7 +390,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 6
+  - time: 5.9166665
     functionName: OnDissolveInEnd
     data: 
     objectReferenceParameter: {fileID: 0}
