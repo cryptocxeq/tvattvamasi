@@ -8,7 +8,7 @@ public class TouchParticleController : MonoBehaviour
 
 	private Queue<ParticleSystem> particlesPool;
 	private ParticleSystem currentParticleSystem;
-	private int lastTouchCount = 0;
+	public InputController inputController;
 
 	private void Awake()
 	{
@@ -21,30 +21,18 @@ public class TouchParticleController : MonoBehaviour
 		}
 	}
 
-	private void Update()
+	private void OnEnable()
 	{
-		Vector3 inputPosition;
+		inputController.onInputDown += OnInputStart;
+		inputController.onInput += OnInputContinue;
+		inputController.onInputUp += OnInputEnd;
+	}
 
-#if UNITY_ANDROID || UNITY_IOS
-		if (Input.touchCount > 0)
-		{
-			inputPosition = Input.touches[0].position;
-			if (lastTouchCount <= 0)
-				OnInputStart(inputPosition);
-			else
-				OnInputContinue(inputPosition);
-		} else if (lastTouchCount > 0)
-			OnInputEnd();
-		lastTouchCount = Input.touchCount;
-#else
-		inputPosition = Input.mousePosition;
-		if (Input.GetMouseButtonDown(0))
-			OnInputStart(inputPosition);
-		else if (Input.GetMouseButton(0))
-			OnInputContinue(inputPosition);
-		else if (Input.GetMouseButtonUp(0))
-			OnInputEnd();
-#endif
+	private void OnDisable()
+	{
+		inputController.onInputDown -= OnInputStart;
+		inputController.onInput -= OnInputContinue;
+		inputController.onInputUp -= OnInputEnd;
 	}
 
 	private void OnInputStart(Vector3 inputPosition)

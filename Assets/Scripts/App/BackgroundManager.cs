@@ -16,7 +16,7 @@ public class BackgroundManager : MonoBehaviour
 		bgBack.InitializeAsBack();
 	}
 
-	public void SwitchBackgroundsPosition()
+	public void SwitchBackgrounds()
 	{
 		bgBack.transform.localPosition = frontBackgroundPosition;
 		bgFront.transform.localPosition = backBackgroundPosition;

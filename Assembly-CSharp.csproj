@@ -125,13 +125,14 @@
     <Compile Include="Assets\Scripts\BackgroundController.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovingController.cs" />
     <Compile Include="Assets\Scripts\DebugController.cs" />
-    <Compile Include="Assets\Scripts\GenerateCoordinates.cs" />
+    <Compile Include="Assets\Scripts\InputController.cs" />
+    <Compile Include="Assets\Scripts\IntroManager.cs" />
+    <Compile Include="Assets\Scripts\OnColliderHit.cs" />
     <Compile Include="Assets\Scripts\RandomizeDisplacement.cs" />
     <Compile Include="Assets\Scripts\Rotate.cs" />
     <Compile Include="Assets\Scripts\Template\MinMaxAttribute.cs" />
     <Compile Include="Assets\Scripts\Template\TGlobalSingleton.cs" />
     <Compile Include="Assets\Scripts\Template\Utility.cs" />
-    <Compile Include="Assets\Scripts\TextManager.cs" />
     <Compile Include="Assets\Scripts\UI\MainUIController.cs" />
     <Compile Include="Assets\Scripts\cam.cs" />
     <Compile Include="Assets\Scripts\gyro.cs" />

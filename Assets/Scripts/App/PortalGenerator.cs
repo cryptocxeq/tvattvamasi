@@ -27,11 +27,13 @@ public class PortalGenerator : MonoBehaviour
 	public PortalController portalPrefab;
 	public Transform portalParent;
 	public ContactFilter2D portalContactFilter;
+	public InputController inputController;
 
 	private List<PortalController> activePortals = new List<PortalController>();
 	private Queue<PortalController> portalsPool;
 	private int completedPortalsCount;
 	private List<RaycastHit2D> raycastHit = new List<RaycastHit2D>();
+	private bool isTransitioning = false;
 
 	private void Awake()
 	{
@@ -47,24 +49,20 @@ public class PortalGenerator : MonoBehaviour
 		}
 	}
 
-	private void Update()
+	private void OnEnable()
 	{
-		Vector3 inputPosition;
-		bool inputPressed = false;
+		inputController.onInput += OnInput;
+	}
 
-#if UNITY_ANDROID || UNITY_IOS
-		if (Input.touchCount > 0)
-		{
-			inputPressed = true;
-			inputPosition = Input.touches[0].position;
-		}
-#else
-		inputPosition = Input.mousePosition;
-		inputPressed = Input.GetMouseButton(0);
-#endif
-		if (inputPressed)
-		{
+	private void OnDisable()
+	{
+		inputController.onInput -= OnInput;
+	}
 
+	private void OnInput(Vector3 inputPosition)
+	{
+		if (!MainApp.Instance.uiController.endScreenPanel.activeInHierarchy)
+		{
 			if (Physics2D.Raycast(Camera.main.ScreenToWorldPoint(inputPosition), Vector2.zero, portalContactFilter, raycastHit) > 0)
 			{
 				PortalController pc = raycastHit[0].collider.GetComponent<PortalController>();
@@ -85,6 +83,24 @@ public class PortalGenerator : MonoBehaviour
 		GeneratePortal();
 	}
 
+	public void StopGeneratingPortals()
+	{
+		StopAllCoroutines();
+	}
+
+	public void ResumeGeneratingPortals()
+	{
+		for (int i = 0; i < activePortals.Count; i++)
+		{
+			if (!activePortals[i].isPortalCompleted)
+			{
+				return;
+			}
+		}
+		if (!isTransitioning)
+			GeneratePortalAfterRandomTime();
+	}
+
 	public void GeneratePortal()
 	{
 		if (portalsPool.Count <= 0)
@@ -101,6 +117,13 @@ public class PortalGenerator : MonoBehaviour
 			portal.StartPortal(positionToSpawn, lifetime);
 			Debug.Log("Portal generated at " + positionToSpawn.ToString(), portal);
 		}
+	}
+
+	public void RemovePortals()
+	{
+		completedPortalsCount = 0;
+		for (int i = activePortals.Count - 1; i >= 0; i--)
+			activePortals[i].RemovePortal();
 	}
 
 	public void OnPortalCompleted(PortalController portal)
@@ -131,13 +154,21 @@ public class PortalGenerator : MonoBehaviour
 	{
 		Debug.Log("start scaling sequence ");
 
-		Sequence portalSeq = Utility.NewSequence();
-		for (int i = 0; i < activePortals.Count; i++)
-			portalSeq.Join(activePortals[i].GetScalingSequence());
-		portalSeq.AppendCallback(MainApp.Instance.StartBGTransition);
-		portalSeq.AppendCallback(GeneratePortalAfterRandomTime);
-		portalSeq.Play();
+		if (!isTransitioning)
+		{
+			Sequence portalSeq = Utility.NewSequence();
+			for (int i = 0; i < activePortals.Count; i++)
+				portalSeq.Join(activePortals[i].GetScalingSequence());
+			portalSeq.AppendCallback(OnScalingSequenceOver);
+			portalSeq.Play();
+		}
+	}
 
+	private void OnScalingSequenceOver()
+	{
+		isTransitioning = false;
+		MainApp.Instance.backgroundManager.SwitchBackgrounds();
+		GeneratePortalAfterRandomTime();
 		completedPortalsCount = 0;
 	}
 

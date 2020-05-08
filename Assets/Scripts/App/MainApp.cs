@@ -4,89 +4,102 @@ using ToJ;
 
 public class MainApp : TGlobalSingleton<MainApp>
 {
-
-	public float gameLength = 180f;
+	public int gameLengthOption1 = 5;
+	public int gameLengthOption2 = 10;
+	public int gameLengthOption3 = 15;
+	public int gameLengthOption4 = 30;
 
 	public AudioManager audioManager;
 	public Mask maskForUpdate;
 	public PortalGenerator portalGenerator;
 	public BackgroundManager backgroundManager;
+	public IntroManager introManager;
+	public MainUIController uiController;
 
-	//Count time length
 	private Stopwatch stopwatch = new Stopwatch();
-	private bool stopwatchRunning;
+	private int elapsedTime;
+	private bool isInfinite;
 
-	// DEBUG
-	public double elapsedTime;
+	public int currentGameLength
+	{
+		get; private set;
+	}
+
+	public int timeleft
+	{
+		get
+		{
+			return currentGameLength - elapsedTime;
+		}
+	}
+
+	private void Start()
+	{
+		StartIntro();
+	}
 
 	private void Update()
 	{
-		if (stopwatch.IsRunning && stopwatchRunning)
+		if (stopwatch.IsRunning)
 		{
-			elapsedTime = stopwatch.Elapsed.TotalSeconds;
-			// update game length gui
-			//imageFill = Mathf.Lerp(0f, 1f, Mathf.Clamp01((float)stopwatch.Elapsed.TotalSeconds / hoverTime));
-			//image.fillAmount = imageFill;
-			MainUIController.Instance.UpdateGameTime(((int)gameLength - stopwatch.Elapsed.Seconds).ToString());
+			elapsedTime = (int)stopwatch.Elapsed.TotalSeconds;
 
-			if (stopwatch.Elapsed.TotalSeconds > gameLength)
+			if (!isInfinite && stopwatch.Elapsed.TotalSeconds > currentGameLength)
 			{
-				//End game, time expired
-				stopwatchRunning = false;
 				EndGame();
 			}
 		}
 	}
 
-	public void StartGame()
+	public void StartIntro()
 	{
-		MainUIController.Instance.ShowGameplayUI();
-		StartStopwatch();
+		ResumeGame();
+		introManager.StartIntro();
+		portalGenerator.RemovePortals();
+		portalGenerator.StopGeneratingPortals();
+		uiController.HideUI();
+	}
+
+	public void StartNewGame(int duration)
+	{
+		ResumeGame();
+		introManager.HideIntro();
+		isInfinite = false;
+		stopwatch.Reset();
+		stopwatch.Start();
+		currentGameLength = duration * 60;
+		portalGenerator.RemovePortals();
+		portalGenerator.StopGeneratingPortals();
 		portalGenerator.GeneratePortalAfterRandomTime();
+		uiController.HideUI();
+		uiController.ShowPauseButton();
+	}
+
+	public void ContinueGameInfinitely()
+	{
+		currentGameLength = int.MaxValue;
+		isInfinite = true;
+		stopwatch.Start();
+		portalGenerator.ResumeGeneratingPortals();
+		uiController.HideUI();
+		uiController.ShowPauseButton();
 	}
 
 	public void EndGame()
 	{
-		StopStopwatch();
-		MainUIController.Instance.ShowEndScreen();
-	}
-
-	public void SetGameLength(float length)
-	{
-		gameLength = length * 60f;
-	}
-
-	public void StartBGTransition()
-	{
-		backgroundManager.SwitchBackgroundsPosition();
-	}
-
-	public void UpdateMask()
-	{
-		print("Mask refreshed!");
-		maskForUpdate.ScheduleFullMaskRefresh();
-	}
-
-	private void StartStopwatch()
-	{
-		stopwatch.Reset();
-		stopwatch.Start();
-		stopwatchRunning = true;
-	}
-
-	private void StopStopwatch()
-	{
 		stopwatch.Stop();
-		stopwatchRunning = false;
+		portalGenerator.StopGeneratingPortals();
+		uiController.HideUI();
+		uiController.ShowEndScreen();
 	}
 
-	//public void PauseGame()
-	//{
-	//    stopwatch.Stop();
-	//}
+	public void PauseGame()
+	{
+		Time.timeScale = 0f;
+	}
 
-	//public void ResumeGame()
-	//{
-	//    stopwatch.Start();
-	//}
+	public void ResumeGame()
+	{
+		Time.timeScale = 1f;
+	}
 }

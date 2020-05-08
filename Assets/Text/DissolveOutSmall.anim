@@ -474,21 +474,21 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.51666665
-    functionName: DOAudio
+    functionName: OnPlayDissolveOutAudio
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 2.5
-    functionName: DissolveOutTriggerIn
+    functionName: OnDissolveOutTriggerIn
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 5.983333
-    functionName: DissolveOutEnd
+    functionName: OnDissolveOutEnd
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

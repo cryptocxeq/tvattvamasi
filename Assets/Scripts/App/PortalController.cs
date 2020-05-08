@@ -75,7 +75,7 @@ public class PortalController : MonoBehaviour
 		psinObject.Play();
 	}
 
-	private void RemovePortal()
+	public void RemovePortal()
 	{
 		lifetimeWatch.Stop();
 		touchDuration = 0f;
