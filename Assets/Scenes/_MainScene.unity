@@ -5460,7 +5460,7 @@ MonoBehaviour:
     minNormalAngle: 0
     maxNormalAngle: 0
   optionsDisplayInterval: 1
-  dissolveAnimatorSpeedMultiplier: 3
+  dissolveAnimatorSpeedMultiplier: 2
 --- !u!1 &228638588
 GameObject:
   m_ObjectHideFlags: 0
@@ -17685,7 +17685,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1743048414
 RectTransform:
   m_ObjectHideFlags: 0

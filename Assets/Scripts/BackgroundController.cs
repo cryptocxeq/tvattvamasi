@@ -134,7 +134,7 @@ public class BackgroundController : MonoBehaviour
 		if (generatorParams.generateNebulas)
 			SetNebulaUnlitShader();
 		for (int i = 0; i < starsRenderers.Length; i++)
-			starsRenderers[i].material.shader = Shader.Find("Mobile/Particles/Additive");
+			starsRenderers[i].material.shader = Shader.Find("Mobile/Particles/Alpha Blended");
 		for (int i = 0; i < alphaTexturesRenderers.Length; i++)
 			alphaTexturesRenderers[i].material.shader = Shader.Find("Unlit/Transparent");
 	}

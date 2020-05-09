@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 public class DebugController : MonoBehaviour
 {
 	public int gameLength = 1;
@@ -40,4 +40,4 @@ public class DebugController : MonoBehaviour
 		}
 	}
 }
-#endif
+//#endif
