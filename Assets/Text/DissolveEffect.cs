@@ -3,6 +3,20 @@ using UnityEngine;
 
 public class DissolveEffect : MonoBehaviour
 {
+	private struct ParticleMainModule
+	{
+		public float startDelay;
+		public float startLifetime;
+		public float startSpeed;
+
+		public ParticleMainModule(ParticleSystem.MainModule mainModule)
+		{
+			startDelay = mainModule.startDelayMultiplier;
+			startLifetime = mainModule.startLifetimeMultiplier;
+			startSpeed = mainModule.startSpeedMultiplier; 
+		}
+	}
+
 	public Animator animator;
 	public SpriteRenderer spriteRenderer;
 	public Collider2D collider2DComp;
@@ -12,6 +26,8 @@ public class DissolveEffect : MonoBehaviour
 	public bool instantiateParticles = false;
 	public float dissolveInEmission = 200;
 	public float dissolveOutEmission = 200;
+	public float idleEmission = 200;
+	public float particlesSpeedMultiplier = 1f;
 
 	public readonly int dissolveInHash = Animator.StringToHash("DissolveIn");
 	public readonly int dissolveInSmallHash = Animator.StringToHash("DissolveInSmall");
@@ -24,6 +40,10 @@ public class DissolveEffect : MonoBehaviour
 	private ParticleSystem currentOutParticles;
 	private ParticleSystem currentIdleParticles;
 
+	private ParticleMainModule defaultInParticles;
+	private ParticleMainModule defaultOutParticles;
+	private ParticleMainModule defaultIdleParticles;
+
 	public bool isDissolvingIn
 	{
 		get; private set;
@@ -35,6 +55,13 @@ public class DissolveEffect : MonoBehaviour
 	}
 
 	public System.Action onDissolvedOut = () => { };
+
+	private void Awake()
+	{
+		defaultInParticles = new ParticleMainModule(dissolveInSystem.main);
+		defaultOutParticles = new ParticleMainModule(dissolveOutSystem.main);
+		defaultIdleParticles = new ParticleMainModule(textIdleSystem.main);
+	}
 
 	public void SetHidden()
 	{
@@ -129,28 +156,35 @@ public class DissolveEffect : MonoBehaviour
 
 	private void SetDissolveInParticles()
 	{
+		ParticleSystem.MainModule mn;
 		if (instantiateParticles)
 		{
 			currentInParticles = Instantiate(dissolveInSystem, gameObject.transform.position, Quaternion.identity);
-			ParticleSystem.MainModule mn = currentInParticles.main;
+			mn = currentInParticles.main;
 			mn.stopAction = ParticleSystemStopAction.Destroy;
 		}
 		else
 		{
 			currentInParticles = dissolveInSystem;
-			ParticleSystem.MainModule mn = currentInParticles.main;
+			mn = currentInParticles.main;
 			mn.stopAction = ParticleSystemStopAction.None;
 		}
 		//currentInParticles.gameObject.SetActive(true);
 		currentInParticles.transform.localScale.Set(0.5f, 0.5f, 0);
+
 		ParticleSystem.ShapeModule sh = currentInParticles.shape;
 		sh.enabled = true;
 		sh.texture = spriteRenderer.sprite.texture;
 		sh.sprite = spriteRenderer.sprite;
 		sh.textureColorAffectsParticles = true;
+
 		ParticleSystem.EmissionModule em = currentInParticles.emission;
 		em.enabled = true;
 		em.rateOverTimeMultiplier = dissolveInEmission;
+
+		mn.startLifetimeMultiplier = defaultInParticles.startLifetime / particlesSpeedMultiplier;
+		mn.startSpeedMultiplier = defaultInParticles.startSpeed * particlesSpeedMultiplier;
+
 		currentInParticles.Play();
 
 		StartCoroutine(EnableAfterTime(0f));
@@ -166,16 +200,18 @@ public class DissolveEffect : MonoBehaviour
 	{
 		if (currentInParticles != null)
 			currentInParticles.Stop();
+
+		ParticleSystem.MainModule mn;
 		if (instantiateParticles)
 		{
 			currentIdleParticles = Instantiate(textIdleSystem, gameObject.transform.position, Quaternion.identity);
-			ParticleSystem.MainModule mn = currentIdleParticles.main;
+			mn = currentIdleParticles.main;
 			mn.stopAction = ParticleSystemStopAction.Destroy;
 		}
 		else
 		{
 			currentIdleParticles = textIdleSystem;
-			ParticleSystem.MainModule mn = currentIdleParticles.main;
+			mn = currentIdleParticles.main;
 			mn.stopAction = ParticleSystemStopAction.None;
 		}
 
@@ -194,6 +230,10 @@ public class DissolveEffect : MonoBehaviour
 
 		ParticleSystem.EmissionModule em = currentIdleParticles.emission;
 		em.enabled = true;
+		em.rateOverTimeMultiplier = idleEmission;
+
+		//mn.startLifetimeMultiplier = defaultIdleParticles.startLifetime / particlesSpeedMultiplier;
+		//mn.startSpeedMultiplier = defaultIdleParticles.startSpeed * particlesSpeedMultiplier;
 
 		currentIdleParticles.Play();
 	}
@@ -203,16 +243,17 @@ public class DissolveEffect : MonoBehaviour
 		if (currentIdleParticles != null)
 			currentIdleParticles.Stop();
 
+		ParticleSystem.MainModule mn;
 		if (instantiateParticles)
 		{
 			currentOutParticles = Instantiate(dissolveOutSystem, gameObject.transform.position, Quaternion.identity);
-			ParticleSystem.MainModule mn = currentOutParticles.main;
+			mn = currentOutParticles.main;
 			mn.stopAction = ParticleSystemStopAction.Destroy;
 		}
 		else
 		{
 			currentOutParticles = dissolveOutSystem;
-			ParticleSystem.MainModule mn = currentOutParticles.main;
+			mn = currentOutParticles.main;
 			mn.stopAction = ParticleSystemStopAction.None;
 		}
 		//currentOutParticles.gameObject.SetActive(true);
@@ -227,6 +268,10 @@ public class DissolveEffect : MonoBehaviour
 		ParticleSystem.EmissionModule em = currentOutParticles.emission;
 		em.enabled = true;
 		em.rateOverTimeMultiplier = dissolveOutEmission;
+
+		mn.startLifetimeMultiplier = defaultOutParticles.startLifetime / particlesSpeedMultiplier;
+		mn.startSpeedMultiplier = defaultOutParticles.startSpeed * particlesSpeedMultiplier;
+
 
 		currentOutParticles.Play();
 	}

@@ -8,16 +8,22 @@ public class PortalGenerator : MonoBehaviour
 	[System.Serializable]
 	public class GeneratorParams
 	{
+		[Tooltip("Range to randomly set portal lifetme (this is turned off and doesn't do anything since portal stays forever).")]
 		[MinMax(1, 10, ShowEditRange = true)]
 		public Vector2 portalLifetime = new Vector2(5, 15);
+		[Tooltip("Range to randomly set delay between each portal spawn.")]
 		[MinMax(1, 10, ShowEditRange = true)]
 		public Vector2 timeToGeneratePortal = new Vector2(4, 8);
+		[Tooltip("Area of the screen that portals can spawn. Values are in viewport.")]
 		[MinMax(0, 1, ShowEditRange = true)]
 		public Vector2 portalSpawnRangeX = new Vector2(0, 1);
+		[Tooltip("Area of the screen that portals can spawn. Values are in viewport.")]
 		[MinMax(0, 1, ShowEditRange = true)]
 		public Vector2 portalSpawnRangeY = new Vector2(0, 1);
 
+		[Tooltip("Minimum distance at which portals can spawn between each other.")]
 		public float minPortalDistance = 1;
+		[Tooltip("Number of portals that must be complete to transition to next background.")]
 		public int numberOfPortalsToTransitionToNextScene = 4;
 	}
 

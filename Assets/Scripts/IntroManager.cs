@@ -27,6 +27,7 @@ public class IntroManager : MonoBehaviour
 	private IntroState introState;
 	private List<RaycastHit2D> raycastHit = new List<RaycastHit2D>();
 	private DissolveEffect[] dissolveEffects;
+	private int selectedGameLength;
 
 	private void Awake()
 	{
@@ -45,6 +46,7 @@ public class IntroManager : MonoBehaviour
 		logoDE.onDissolvedOut += OnLogoEnd;
 		introText1DE.onDissolvedOut += OnIntroText1End;
 		introText2DE.onDissolvedOut += OnIntroText2End;
+		introText3DE.onDissolvedOut += OnIntroText3End;
 
 		option1DE.GetComponent<OnColliderHit>().onHit += OnOption1Click;
 		option2DE.GetComponent<OnColliderHit>().onHit += OnOption2Click;
@@ -58,6 +60,7 @@ public class IntroManager : MonoBehaviour
 		logoDE.onDissolvedOut -= OnLogoEnd;
 		introText1DE.onDissolvedOut -= OnIntroText1End;
 		introText2DE.onDissolvedOut -= OnIntroText2End;
+		introText3DE.onDissolvedOut -= OnIntroText3End;
 
 		option1DE.GetComponent<OnColliderHit>().onHit -= OnOption1Click;
 		option2DE.GetComponent<OnColliderHit>().onHit -= OnOption2Click;
@@ -111,8 +114,6 @@ public class IntroManager : MonoBehaviour
 			}
 			case IntroState.Text1:
 			{
-				if (!introText1DE.isDissolvingIn && !introText1DE.isDissolvingOut)
-					introText1DE.DissolveOut();
 				break;
 			}
 			case IntroState.Text2:
@@ -121,12 +122,22 @@ public class IntroManager : MonoBehaviour
 					introText2DE.DissolveOut();
 				break;
 			}
+			case IntroState.Text3:
+			{
+				if (!introText3DE.isDissolvingIn && !introText3DE.isDissolvingOut)
+					introText3DE.DissolveOut();
+				break;
+			}
 		}
 	}
 
 	private void OnLogoEnd()
 	{
 		introText1DE.DissolveIn();
+		option1DE.DissolveIn(optionsDisplayInterval);
+		option2DE.DissolveIn(optionsDisplayInterval * 2);
+		option3DE.DissolveIn(optionsDisplayInterval * 3);
+		option4DE.DissolveIn(optionsDisplayInterval * 4);
 		introState = IntroState.Text1;
 	}
 
@@ -139,42 +150,63 @@ public class IntroManager : MonoBehaviour
 	private void OnIntroText2End()
 	{
 		introText3DE.DissolveIn();
-		option1DE.DissolveIn(optionsDisplayInterval);
-		option2DE.DissolveIn(optionsDisplayInterval * 2);
-		option3DE.DissolveIn(optionsDisplayInterval * 3);
-		option4DE.DissolveIn(optionsDisplayInterval * 4);
 		introState = IntroState.Text3;
 	}
 
-	private void StartGame(int duration)
+	private void OnIntroText3End()
 	{
-		introText3DE.DissolveOut();
+		introState = IntroState.Hidden;
+		MainApp.Instance.StartNewGame(selectedGameLength);
+	}
+
+	private void SelectGameLength(int duration)
+	{
+		selectedGameLength = duration;
+		introText1DE.DissolveOut();
 		option1DE.DissolveOut();
 		option2DE.DissolveOut();
 		option3DE.DissolveOut();
 		option4DE.DissolveOut();
-		introState = IntroState.Hidden;
-		MainApp.Instance.StartNewGame(duration);
 	}
 
 	private void OnOption1Click()
 	{
-		StartGame(MainApp.Instance.gameLengthOption1);
+		if (!introText1DE.isDissolvingIn && !introText1DE.isDissolvingOut &&
+			!option1DE.isDissolvingIn && !option1DE.isDissolvingOut &&
+			!option2DE.isDissolvingIn && !option2DE.isDissolvingOut &&
+			!option3DE.isDissolvingIn && !option3DE.isDissolvingOut &&
+			!option4DE.isDissolvingIn && !option4DE.isDissolvingOut)
+			SelectGameLength(MainApp.Instance.gameLengthOption1);
 	}
 
 	private void OnOption2Click()
 	{
-		StartGame(MainApp.Instance.gameLengthOption2);
+		if (!introText1DE.isDissolvingIn && !introText1DE.isDissolvingOut &&
+			!option1DE.isDissolvingIn && !option1DE.isDissolvingOut &&
+			!option2DE.isDissolvingIn && !option2DE.isDissolvingOut &&
+			!option3DE.isDissolvingIn && !option3DE.isDissolvingOut &&
+			!option4DE.isDissolvingIn && !option4DE.isDissolvingOut)
+			SelectGameLength(MainApp.Instance.gameLengthOption2);
 	}
 
 	private void OnOption3Click()
 	{
-		StartGame(MainApp.Instance.gameLengthOption3);
+		if (!introText1DE.isDissolvingIn && !introText1DE.isDissolvingOut &&
+			!option1DE.isDissolvingIn && !option1DE.isDissolvingOut &&
+			!option2DE.isDissolvingIn && !option2DE.isDissolvingOut &&
+			!option3DE.isDissolvingIn && !option3DE.isDissolvingOut &&
+			!option4DE.isDissolvingIn && !option4DE.isDissolvingOut)
+			SelectGameLength(MainApp.Instance.gameLengthOption3);
 	}
 
 	private void OnOption4Click()
 	{
-		StartGame(MainApp.Instance.gameLengthOption4);
+		if (!introText1DE.isDissolvingIn && !introText1DE.isDissolvingOut &&
+			!option1DE.isDissolvingIn && !option1DE.isDissolvingOut &&
+			!option2DE.isDissolvingIn && !option2DE.isDissolvingOut &&
+			!option3DE.isDissolvingIn && !option3DE.isDissolvingOut &&
+			!option4DE.isDissolvingIn && !option4DE.isDissolvingOut)
+			SelectGameLength(MainApp.Instance.gameLengthOption4);
 	}
 
 	//// Update is called once per frame

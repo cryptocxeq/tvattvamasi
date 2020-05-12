@@ -1,55 +1,45 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
 public class AudioManager : MonoBehaviour
 {
+	public enum AudioEventType
+	{
+		ScreenClicked,
+		ScreenHoldDown,
 
-    AudioSource audio;
+	}
 
-    public AudioClip[] clips;
-    // Start is called before the first frame update
-    void Start()
-    {
-        audio = GetComponent<AudioSource>();
-    }
+	[System.Serializable]
+	public class AudioEvent
+	{
+		public AudioEventType eventType;
+		public AudioSource audioSource;
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public AudioEvent[] audioEvents;
 
-    public void Play()
-    {
-        //if (audioo.clip != null)
-      //  {
-      //      audioo.Play();
-      //  }
-    }
+	private Dictionary<AudioEventType, AudioSource> indexedAudio;
 
-    public void Stop()
-    {
-       // audioo.Stop();
-    }
+	private void Awake()
+	{
+		indexedAudio = new Dictionary<AudioEventType, AudioSource>(audioEvents.Length);
+		for (int i = 0; i < audioEvents.Length; i++)
+		{
+			if (indexedAudio.ContainsKey(audioEvents[i].eventType))
+				Debug.LogError(audioEvents[i].eventType + " Key already exist in the dictionary! Each audio event needs unique AudioEventType!");
+			else
+				indexedAudio.Add(audioEvents[i].eventType, audioEvents[i].audioSource);
+		}
+	}
 
-    public void TogglePlayPause()
-    {
-       // if (audioo.isPlaying)
-    //    {
-    //        audioo.Pause();
-    //    }
-     //   else
-    //    {
-     //       audioo.Play();
-      //  }
-    }
+	public void PlayAudio(AudioEventType eventType)
+	{
+		indexedAudio[eventType].Play();
+	}
 
-    public void SetAudioVolumeLevel(float volume)
-    {
-      //  volume = Mathf.Clamp(volume, 0f,1f);
-     //   audioo.volume = volume;
-    }
-
+	public void StopAudio(AudioEventType eventType)
+	{
+		indexedAudio[eventType].Stop();
+	}
 }

@@ -105,6 +105,8 @@ MonoBehaviour:
   instantiateParticles: 0
   dissolveInEmission: 1500
   dissolveOutEmission: 1200
+  idleEmission: 200
+  particlesSpeedMultiplier: 2
 --- !u!114 &3731782170931620885
 MonoBehaviour:
   m_ObjectHideFlags: 0
