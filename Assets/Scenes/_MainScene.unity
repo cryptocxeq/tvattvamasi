@@ -5670,6 +5670,7 @@ MonoBehaviour:
   bgBack: {fileID: 1774241649}
   allBackgrounds:
   - {fileID: 2800000, guid: 4a7a4f5f0d121604a9b617ba538b5e8a, type: 3}
+  - {fileID: 2800000, guid: 9596db937bc467646882be9b3d73d83c, type: 3}
   - {fileID: 2800000, guid: 82228ddff6940ad43a460b3e8d3f7bbb, type: 3}
   - {fileID: 2800000, guid: accbbfc6a36f0654c9b5e55365e932f6, type: 3}
   - {fileID: 2800000, guid: ab10652e106bbf24f990666dde1aea94, type: 3}
