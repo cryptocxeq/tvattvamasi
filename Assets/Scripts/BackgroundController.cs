@@ -68,6 +68,7 @@ public class BackgroundController : MonoBehaviour
 	private MeshRenderer[] alphaTexturesRenderers;
 	private float targetAudioVolume;
 	private float audioFadeTimer;
+	private MandalaController currentMandala;
 
 	private void Awake()
 	{
@@ -117,13 +118,15 @@ public class BackgroundController : MonoBehaviour
 	private void SetAlphaMaskedShaders()
 	{
 		if (generatorParams.generateBackground)
-			SetBackgroundAlphaMashShader();
+			SetBackgroundAlphaMaskShader();
 		if (generatorParams.generateNebulas)
 			SetNebulaAlphaMashShader();
 		for (int i = 0; i < starsRenderers.Length; i++)
 			starsRenderers[i].material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
 		for (int i = 0; i < alphaTexturesRenderers.Length; i++)
 			alphaTexturesRenderers[i].material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
+		if (currentMandala != null)
+			SetMandalaAlphaMaskShader();
 	}
 
 	private void SetUnlitShaders()
@@ -136,6 +139,8 @@ public class BackgroundController : MonoBehaviour
 			starsRenderers[i].material.shader = Shader.Find("Mobile/Particles/Alpha Blended");
 		for (int i = 0; i < alphaTexturesRenderers.Length; i++)
 			alphaTexturesRenderers[i].material.shader = Shader.Find("Mobile/Particles/Alpha Blended");
+		if (currentMandala != null)
+			SetMandalaUnlitShader();
 	}
 
 	#region Nebula
@@ -227,7 +232,7 @@ public class BackgroundController : MonoBehaviour
 		generatorParams.backgroundParams.backgroundRenderer.material.mainTextureOffset += Vector2.up * generatorParams.backgroundParams.spaceMainMovementSpeed * generatorParams.backgroundParams.backgroundRenderer.material.mainTextureScale.y * Time.deltaTime;
 	}
 
-	private void SetBackgroundAlphaMashShader()
+	private void SetBackgroundAlphaMaskShader()
 	{
 		generatorParams.backgroundParams.backgroundRenderer.material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
 	}
@@ -235,6 +240,36 @@ public class BackgroundController : MonoBehaviour
 	private void SetBackgroundUnlitShader()
 	{
 		generatorParams.backgroundParams.backgroundRenderer.material.shader = Shader.Find("Unlit/Texture");
+	}
+
+	#endregion
+
+	#region Mandala
+
+	public void SetMandala(MandalaController mandala)
+	{
+		currentMandala = mandala;
+		mandala.transform.SetParent(transform);
+		mandala.transform.localPosition = Vector3.back * 6;
+		mandala.gameObject.SetActive(true);
+	}
+
+	public void DissolveMandala()
+	{
+		if (currentMandala != null)
+			currentMandala.Dissolve();
+	}
+
+	private void SetMandalaAlphaMaskShader()
+	{
+		for (int i = 0; i < currentMandala.particleRenderers.Length; i++)
+			currentMandala.particleRenderers[i].material.shader = Shader.Find("Alpha Masked/Unlit Alpha Masked - World Coords");
+	}
+
+	private void SetMandalaUnlitShader()
+	{
+		for (int i = 0; i < currentMandala.particleRenderers.Length; i++)
+			currentMandala.particleRenderers[i].material.shader = Shader.Find("Mobile/Particles/Alpha Blended");
 	}
 
 	#endregion

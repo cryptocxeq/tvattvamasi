@@ -145,7 +145,7 @@
     <Compile Include="Assets\Shared\Scripts\SimpleCharacterMotor.cs" />
     <Compile Include="Assets\Text\DissolveEffect.cs" />
     <Compile Include="Assets\Text\TextController.cs" />
-    <Compile Include="Assets\mandala\parti.cs" />
+    <Compile Include="Assets\mandala\MandalaController.cs" />
     <None Include="Assets\ParticleDistortTexture\Shaders\Particle_DistortTex_Scroll.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-Overlay.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-Framebuffer.shader" />

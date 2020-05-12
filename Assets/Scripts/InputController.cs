@@ -6,7 +6,9 @@ public class InputController : MonoBehaviour
 	public System.Action<Vector3> onInput = (vec) => { };
 	public System.Action onInputUp = () => { };
 
+#if UNITY_ANDROID || UNITY_IOS
 	private int lastTouchCount = 0;
+#endif
 
 	private void Update()
 	{
@@ -22,7 +24,8 @@ public class InputController : MonoBehaviour
 		} else if (lastTouchCount > 0)
 			onInputUp.Invoke();
 		lastTouchCount = Input.touchCount;
-#else
+#endif
+#if UNITY_EDITOR || UNITY_STANDALONE
 		inputPosition = Input.mousePosition;
 		if (Input.GetMouseButtonDown(0))
 			onInputDown.Invoke(inputPosition);

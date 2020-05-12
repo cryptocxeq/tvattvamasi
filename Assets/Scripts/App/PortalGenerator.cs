@@ -182,7 +182,7 @@ public class PortalGenerator : MonoBehaviour
 	{
 		isTransitioning = false;
 		MainApp.Instance.backgroundManager.OnSwitchBackgroundsEnd();
-		GeneratePortalAfterRandomTime();
+		//GeneratePortalAfterRandomTime();
 		completedPortalsCount = 0;
 	}
 

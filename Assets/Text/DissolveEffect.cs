@@ -13,7 +13,7 @@ public class DissolveEffect : MonoBehaviour
 		{
 			startDelay = mainModule.startDelayMultiplier;
 			startLifetime = mainModule.startLifetimeMultiplier;
-			startSpeed = mainModule.startSpeedMultiplier; 
+			startSpeed = mainModule.startSpeedMultiplier;
 		}
 	}
 
@@ -77,7 +77,8 @@ public class DissolveEffect : MonoBehaviour
 		spriteRenderer.enabled = false;
 		gameObject.SetActive(false);
 		StopAllCoroutines();
-		animator.SetTrigger(hiddenHash);
+		if (gameObject.activeInHierarchy)
+			animator.SetTrigger(hiddenHash);
 	}
 
 	public void DissolveIn(float startDelay = 0f, bool small = false)
