@@ -29,8 +29,6 @@ public class BackgroundController : MonoBehaviour
 		public class BackgroundGeneratorParams
 		{
 			public MeshRenderer backgroundRenderer;
-
-			public Texture2D[] backgroundTextures;
 			public float spaceMainMovementSpeed;
 		}
 
@@ -209,6 +207,11 @@ public class BackgroundController : MonoBehaviour
 
 	#region Background
 
+	public void SetBackground(Texture2D texture)
+	{
+		generatorParams.backgroundParams.backgroundRenderer.material.mainTexture = texture;
+	}
+
 	private void InitializeBackground()
 	{
 
@@ -216,8 +219,7 @@ public class BackgroundController : MonoBehaviour
 
 	private void RandomizeBackground()
 	{
-		Texture2D randomizedTexture = generatorParams.backgroundParams.backgroundTextures[Random.Range(0, generatorParams.backgroundParams.backgroundTextures.Length)];
-		generatorParams.backgroundParams.backgroundRenderer.material.mainTexture = randomizedTexture;
+
 	}
 
 	private void MoveBackground()

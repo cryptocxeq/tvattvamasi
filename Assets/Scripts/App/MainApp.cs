@@ -19,6 +19,8 @@ public class MainApp : TGlobalSingleton<MainApp>
 	private int elapsedTime;
 	private bool isInfinite;
 
+	public static readonly System.Random random = new System.Random();
+
 	public int currentGameLength
 	{
 		get; private set;

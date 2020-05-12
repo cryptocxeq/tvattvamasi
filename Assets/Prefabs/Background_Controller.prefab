@@ -319,9 +319,7 @@ MonoBehaviour:
     generateBackground: 1
     backgroundParams:
       backgroundRenderer: {fileID: 195527194550053605}
-      backgroundTextures:
-      - {fileID: 2800000, guid: beaba9bf06ba8614d954e150ccf8a44d, type: 3}
-      spaceMainMovementSpeed: 0.01
+      spaceMainMovementSpeed: 0.005
     generateAudio: 1
     audioParams:
       audioSource: {fileID: 4145498644086467355}
