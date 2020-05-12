@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using ToJ;
+using UnityEngine;
 
 //#if UNITY_EDITOR
 public class DebugController : MonoBehaviour
 {
 	public int gameLength = 1;
+	public Mask mask;
 
 	private void Update()
 	{
@@ -37,6 +39,11 @@ public class DebugController : MonoBehaviour
 		{
 			MainApp.Instance.EndGame();
 			MainApp.Instance.introManager.HideIntro();
+		}
+
+		if (Input.GetKeyDown(KeyCode.Alpha0))
+		{
+			mask.ScheduleFullMaskRefresh();
 		}
 	}
 }

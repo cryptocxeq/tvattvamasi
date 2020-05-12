@@ -185,7 +185,7 @@ Transform:
   m_GameObject: {fileID: 195527194790068981}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 18, y: 10, z: 1}
+  m_LocalScale: {x: 20, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 195527194957412815}
   m_RootOrder: 3
@@ -246,7 +246,7 @@ MonoBehaviour:
   _clampAlphaVertically: 0
   _clampingBorder: 0.01
   _useMaskAlphaChannel: 0
-  mainTex: {fileID: 8400000, guid: 9e6977566a852464681729962f27d461, type: 2}
+  mainTex: {fileID: 8400000, guid: af4fa87befcc16e4d9716c51741d6889, type: 2}
   mainTexTiling: {x: 1, y: 1}
   mainTexOffset: {x: 0, y: 0}
   createdMatsStorage: []
@@ -354,6 +354,7 @@ MonoBehaviour:
         m_RotationOrder: 4
   starsContent: {fileID: 2586837785387111665}
   alphaTextures: {fileID: 1002268188019412760}
+  mask: {fileID: 195527194790068971}
 --- !u!1 &195527195747540295
 GameObject:
   m_ObjectHideFlags: 0

@@ -89,7 +89,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5076146460755419259}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.5399998}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5076146460034625122}
@@ -128,7 +128,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 9e6977566a852464681729962f27d461, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: af4fa87befcc16e4d9716c51741d6889, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
@@ -195,8 +195,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5076146460898008370}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.9200001}
-  m_LocalScale: {x: 10, y: 20, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 20, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 5076146461115568300}
   m_RootOrder: 0
@@ -257,7 +257,7 @@ MonoBehaviour:
   _clampAlphaVertically: 0
   _clampingBorder: 0.01
   _useMaskAlphaChannel: 0
-  mainTex: {fileID: 8400000, guid: 9e6977566a852464681729962f27d461, type: 2}
+  mainTex: {fileID: 8400000, guid: af4fa87befcc16e4d9716c51741d6889, type: 2}
   mainTexTiling: {x: 1, y: 1}
   mainTexOffset: {x: 0, y: 0}
   createdMatsStorage: []
@@ -279,7 +279,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5076146461115568300
 Transform:
   m_ObjectHideFlags: 0

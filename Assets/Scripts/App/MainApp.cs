@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Diagnostics;
-using ToJ;
 
 public class MainApp : TGlobalSingleton<MainApp>
 {
@@ -8,9 +7,9 @@ public class MainApp : TGlobalSingleton<MainApp>
 	public int gameLengthOption2 = 10;
 	public int gameLengthOption3 = 15;
 	public int gameLengthOption4 = 30;
+	public float renderTextureResolutionMultiplier = 1;
 
 	public AudioManager audioManager;
-	public Mask maskForUpdate;
 	public PortalGenerator portalGenerator;
 	public BackgroundManager backgroundManager;
 	public IntroManager introManager;

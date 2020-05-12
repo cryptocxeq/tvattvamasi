@@ -36,4 +36,10 @@ public class BackgroundManager : MonoBehaviour
 		bgFront = bgBack;
 		bgBack = tmp;
 	}
+
+	public void SetRenderTexture(RenderTexture rt)
+	{
+		bgFront.mask.MainTex = rt;
+		bgBack.mask.MainTex = rt;
+	}
 }

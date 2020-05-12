@@ -61,6 +61,7 @@ public class BackgroundController : MonoBehaviour
 
 	public Transform starsContent;
 	public Transform alphaTextures;
+	public ToJ.Mask mask;
 
 	private Queue<NebulaCache> nebulaPool;
 	private NebulaCache[] allNebulas;

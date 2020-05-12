@@ -34,6 +34,10 @@ public class PortalGenerator : MonoBehaviour
 	public Transform portalParent;
 	public ContactFilter2D portalContactFilter;
 	public InputController inputController;
+	public MeshRenderer[] transitionMasks;
+	public float masksTargetScale = 20f;
+	public float maskScaleDelay = 2f;
+	public float masksScaleDuration = 1f;
 
 	private List<PortalController> activePortals = new List<PortalController>();
 	private Queue<PortalController> portalsPool;
@@ -48,11 +52,13 @@ public class PortalGenerator : MonoBehaviour
 		for (int i = 0; i < maxNumberOfPortals; i++)
 		{
 			PortalController portal = Instantiate(portalPrefab, portalParent);
-			Transform portalMask = Instantiate(maskObjectPrefab, maskParent);
+			GameObject portalMask = Instantiate(maskObjectPrefab, maskParent).gameObject;
 			portal.gameObject.SetActive(false);
+			portalMask.SetActive(false);
 			portal.InitializePortal(portalMask);
 			portalsPool.Enqueue(portal);
 		}
+		TurnOffMasks();
 	}
 
 	private void OnEnable()
@@ -166,6 +172,7 @@ public class PortalGenerator : MonoBehaviour
 			Sequence portalSeq = Utility.NewSequence();
 			for (int i = 0; i < activePortals.Count; i++)
 				portalSeq.Join(activePortals[i].GetScalingSequence());
+			portalSeq.Join(GetMaskScalingSequence());
 			portalSeq.AppendCallback(OnScalingSequenceOver);
 			portalSeq.Play();
 		}
@@ -179,17 +186,52 @@ public class PortalGenerator : MonoBehaviour
 		completedPortalsCount = 0;
 	}
 
+	private Sequence GetMaskScalingSequence()
+	{
+		Sequence seq = Utility.NewSequence();
+
+		seq.AppendInterval(maskScaleDelay);
+		seq.AppendCallback(TurnOnMasks);
+		for (int i = 0; i < transitionMasks.Length; i++)
+			seq.Join(transitionMasks[i].transform.DOScale(masksTargetScale, masksScaleDuration));
+		seq.AppendCallback(TurnOffMasks);
+
+		return seq;
+	}
+
+	private void TurnOnMasks()
+	{
+		for (int i = 0; i < transitionMasks.Length; i++)
+		{
+			transitionMasks[i].transform.localScale = Vector3.zero;
+			transitionMasks[i].gameObject.SetActive(true);
+		}
+	}
+
+	private void TurnOffMasks()
+	{
+		for (int i = 0; i < transitionMasks.Length; i++)
+		{
+			transitionMasks[i].gameObject.SetActive(false);
+			transitionMasks[i].transform.localScale = Vector3.zero;
+		}
+	}
+
 	private Vector3 GetRandomPortalSpawnPoint()
 	{
 		Vector3 pos = GetRandomPosition();
 		int it = 0;
+		float minPortalDistance = generatorParams.minPortalDistance;
 
-		while (!IsThisGoodPositionToSpawn(pos) && it < 10)
+		while (!IsThisGoodPositionToSpawn(pos, minPortalDistance) && it < 500)
 		{
 			pos = GetRandomPosition();
-			if (it >= 9)
-				Debug.LogError("ERROR: There is no suitable place to place portal, lower your minPortalDistance");
 			it++;
+			if (it >= 50)
+			{
+				minPortalDistance -= 1;
+				it = 0;
+			}
 		}
 		return pos;
 	}
@@ -204,11 +246,11 @@ public class PortalGenerator : MonoBehaviour
 		return result;
 	}
 
-	private bool IsThisGoodPositionToSpawn(Vector3 targetPosition)
+	private bool IsThisGoodPositionToSpawn(Vector3 targetPosition, float minPortalDistance)
 	{
 		for (int i = 0; i < activePortals.Count; i++)
 		{
-			if (Vector2.Distance(activePortals[i].transform.localPosition, targetPosition) < generatorParams.minPortalDistance)
+			if (Vector2.Distance(activePortals[i].transform.localPosition, targetPosition) < minPortalDistance)
 			{
 				return false;
 			}
