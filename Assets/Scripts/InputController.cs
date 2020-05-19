@@ -4,7 +4,7 @@ public class InputController : MonoBehaviour
 {
 	public System.Action<Vector3> onInputDown = (vec) => { };
 	public System.Action<Vector3> onInput = (vec) => { };
-	public System.Action onInputUp = () => { };
+	public System.Action<Vector3> onInputUp = (vec) => { };
 
 #if UNITY_ANDROID || UNITY_IOS
 	private int lastTouchCount = 0;
@@ -32,7 +32,7 @@ public class InputController : MonoBehaviour
 		else if (Input.GetMouseButton(0))
 			onInput.Invoke(inputPosition);
 		else if (Input.GetMouseButtonUp(0))
-			onInputUp.Invoke();
+			onInputUp.Invoke(inputPosition);
 #endif
 	}
 }

@@ -38,6 +38,7 @@ public class PortalGenerator : MonoBehaviour
 	public float masksTargetScale = 20f;
 	public float maskScaleDelay = 2f;
 	public float masksScaleDuration = 1f;
+	public float portalIgnoredTime = 15f;
 
 	private List<PortalController> activePortals = new List<PortalController>();
 	private Queue<PortalController> portalsPool;
@@ -58,30 +59,85 @@ public class PortalGenerator : MonoBehaviour
 			portal.InitializePortal(portalMask);
 			portalsPool.Enqueue(portal);
 		}
-		TurnOffMasks();
+		TurnMasksOff();
 	}
 
 	private void OnEnable()
 	{
 		inputController.onInput += OnInput;
+		inputController.onInputDown += OnInputDown;
+		inputController.onInputUp += OnInputUp;
 	}
 
 	private void OnDisable()
 	{
 		inputController.onInput -= OnInput;
+		inputController.onInputDown -= OnInputDown;
+		inputController.onInputUp -= OnInputUp;
+	}
+
+	private void Update()
+	{
+		for (int i = 0; i < activePortals.Count; i++)
+		{
+			if (!activePortals[i].isPortalCompleted && activePortals[i].elapsedLifetime - activePortals[i].lastInteractionElapsedLifetime > portalIgnoredTime)
+			{
+				if (activePortals[i].touchDuration > 0.01f)
+					MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalTouchedIgnored, 0f);
+				else
+					MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalIgnored, 0f);
+				activePortals[i].lastInteractionElapsedLifetime = activePortals[i].elapsedLifetime;
+			}
+		}
 	}
 
 	private void OnInput(Vector3 inputPosition)
 	{
-		if (!MainApp.Instance.uiController.endScreenPanel.activeInHierarchy)
+		PortalController pc = RaycastPortals(inputPosition);
+		if (pc != null)
 		{
-			if (Physics2D.Raycast(Camera.main.ScreenToWorldPoint(inputPosition), Vector2.zero, portalContactFilter, raycastHit) > 0)
-			{
-				PortalController pc = raycastHit[0].collider.GetComponent<PortalController>();
-				if (pc != null)
-					pc.OnPortalTouch();
-			}
+			pc.OnPortalTouch();
+			if (pc.isPortalCompleted)
+				MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.PortalHold, 0.25f);
+			else
+				MainApp.Instance.audioManager.PlayOrContinueAudio(AudioManager.AudioEventType.PortalHold, 0.25f, pc.touchDuration);
 		}
+		else
+			MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.PortalHold, 0.25f);
+	}
+
+	private void OnInputDown(Vector3 inputPosition)
+	{
+		PortalController pc = RaycastPortals(inputPosition);
+		if (pc != null)
+		{
+			MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalTouched, 0f);
+		}
+	}
+
+	private void OnInputUp(Vector3 inputPosition)
+	{
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.PortalHold, 0.25f);
+
+		PortalController pc = RaycastPortals(inputPosition);
+		if (pc != null)
+		{
+			//if (!pc.isTouchedCompleted)
+			if (pc.isPortalCompleted)
+				MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalReleasedComplete, 0f);
+			else
+				MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalReleasedIncomplete, 0f);
+		}
+	}
+
+	private PortalController RaycastPortals(Vector3 inputPosition)
+	{
+		if (Physics2D.Raycast(Camera.main.ScreenToWorldPoint(inputPosition), Vector2.zero, portalContactFilter, raycastHit) > 0)
+		{
+			return raycastHit[0].collider.GetComponent<PortalController>();
+		}
+
+		return null;
 	}
 
 	public void GeneratePortalAfterRandomTime()
@@ -127,7 +183,7 @@ public class PortalGenerator : MonoBehaviour
 			portal.gameObject.SetActive(true);
 			activePortals.Add(portal);
 			portal.StartPortal(positionToSpawn, lifetime);
-			Debug.Log("Portal generated at " + positionToSpawn.ToString(), portal);
+			MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalAppeard, 0f);
 		}
 	}
 
@@ -140,8 +196,6 @@ public class PortalGenerator : MonoBehaviour
 
 	public void OnPortalCompleted(PortalController portal)
 	{
-		Debug.Log("portal completed on position" + portal.transform.position.ToString(), portal);
-
 		completedPortalsCount++;
 		if (completedPortalsCount >= generatorParams.numberOfPortalsToTransitionToNextScene)
 		{
@@ -151,12 +205,11 @@ public class PortalGenerator : MonoBehaviour
 		{
 			GeneratePortalAfterRandomTime();
 		}
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.PortalCompleted, 0f);
 	}
 
 	public void OnPortalRemoved(PortalController portal)
 	{
-		Debug.Log("portal removed from position " + portal.transform.position.ToString(), portal);
-
 		portal.gameObject.SetActive(false);
 		portalsPool.Enqueue(portal);
 		activePortals.Remove(portal);
@@ -164,10 +217,9 @@ public class PortalGenerator : MonoBehaviour
 
 	public void StartScalingSequence()
 	{
-		Debug.Log("start scaling sequence ");
-
 		if (!isTransitioning)
 		{
+			MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.BackgroundTransition, 0f);
 			MainApp.Instance.backgroundManager.OnSwitchBackgroundsStart();
 			Sequence portalSeq = Utility.NewSequence();
 			for (int i = 0; i < activePortals.Count; i++)
@@ -191,15 +243,15 @@ public class PortalGenerator : MonoBehaviour
 		Sequence seq = Utility.NewSequence();
 
 		seq.AppendInterval(maskScaleDelay);
-		seq.AppendCallback(TurnOnMasks);
+		seq.AppendCallback(TurnMasksOn);
 		for (int i = 0; i < transitionMasks.Length; i++)
 			seq.Join(transitionMasks[i].transform.DOScale(masksTargetScale, masksScaleDuration));
-		seq.AppendCallback(TurnOffMasks);
+		seq.AppendCallback(TurnMasksOff);
 
 		return seq;
 	}
 
-	private void TurnOnMasks()
+	private void TurnMasksOn()
 	{
 		for (int i = 0; i < transitionMasks.Length; i++)
 		{
@@ -208,7 +260,7 @@ public class PortalGenerator : MonoBehaviour
 		}
 	}
 
-	private void TurnOffMasks()
+	private void TurnMasksOff()
 	{
 		for (int i = 0; i < transitionMasks.Length; i++)
 		{

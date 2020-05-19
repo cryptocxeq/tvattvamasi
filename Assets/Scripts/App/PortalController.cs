@@ -50,6 +50,10 @@ public class PortalController : MonoBehaviour
 	//public Vector2 maskAlphaRange = new Vector2(0f, 1f);
 	//public AnimationCurve maskAlphaCurve;
 
+	[Header("Collider scaling")]
+	public AnimationCurve colliderScalingCurve;
+	public Vector2 colliderScaleRange = new Vector2(1f, 2f);
+
 	[Header("References")]
 	public GameObject psin;
 	public GameObject halo;
@@ -60,14 +64,33 @@ public class PortalController : MonoBehaviour
 	private ParticleSystem haloParticleSystem;
 	private ParticleSystemRenderer haloRenderer;
 	private GameObject mask;
+	private CircleCollider2D portalCollider;
 
-	private Stopwatch lifetimeWatch = new Stopwatch();
 	private float portalLifetime = 0f;
-	private float touchDuration = 0f;
+
+	public float elapsedLifetime
+	{
+		get; private set;
+	}
+
+	public float touchDuration
+	{
+		get; private set;
+	}
 
 	public bool isPortalCompleted
 	{
 		get; private set;
+	}
+
+	public bool isTouchedCompleted
+	{
+		get; private set;
+	}
+
+	public float lastInteractionElapsedLifetime
+	{
+		get; set;
 	}
 
 	private void Awake()
@@ -77,17 +100,12 @@ public class PortalController : MonoBehaviour
 		psinRenderer = psin.GetComponent<ParticleSystemRenderer>();
 		haloParticleSystem = halo.GetComponent<ParticleSystem>();
 		haloRenderer = halo.GetComponent<ParticleSystemRenderer>();
+		portalCollider = GetComponent<CircleCollider2D>();
 	}
 
 	private void Update()
 	{
-		//if (lifetimeWatch.IsRunning)
-		//{
-		//	if (lifetimeWatch.Elapsed.TotalSeconds > portalLifetime)
-		//	{
-		//		RemovePortal();
-		//	}
-		//}
+		elapsedLifetime += Time.deltaTime;
 	}
 
 	public void InitializePortal(GameObject mask)
@@ -98,18 +116,18 @@ public class PortalController : MonoBehaviour
 	public void StartPortal(Vector3 position, float lifetime)
 	{
 		portalLifetime = lifetime;
-		transform.position = position;
+		transform.localPosition = position;
 		mask.transform.localPosition = position;
 
-		lifetimeWatch.Reset();
-		lifetimeWatch.Start();
+		elapsedLifetime = 0f;
 
-		SetPsinValues(0f);
+		SetPsinValues(psinScalingCurve.Evaluate(0f));
 		psin.SetActive(true);
-		SetHaloValues(0f);
+		SetHaloValues(haloScalingCurve.Evaluate(0f));
 		halo.SetActive(true);
-		SetMaskValues(0f);
+		SetMaskValues(maskScalingCurve.Evaluate(0f));
 		mask.SetActive(true);
+		SetColliderValues(colliderScalingCurve.Evaluate(0f));
 
 		psinParticleSystem.Play();
 		haloParticleSystem.Play();
@@ -117,7 +135,7 @@ public class PortalController : MonoBehaviour
 
 	public void RemovePortal()
 	{
-		lifetimeWatch.Stop();
+		elapsedLifetime = 0f;
 		touchDuration = 0f;
 		isPortalCompleted = false;
 		mask.SetActive(false);
@@ -126,9 +144,11 @@ public class PortalController : MonoBehaviour
 
 	public void OnPortalTouch()
 	{
+		isTouchedCompleted = isPortalCompleted;
 		if (isPortalCompleted)
 			return;
 		touchDuration += Time.deltaTime;
+		lastInteractionElapsedLifetime = elapsedLifetime;
 
 		float t = touchDuration / touchScalingDuration;
 
@@ -137,6 +157,7 @@ public class PortalController : MonoBehaviour
 			SetPsinValues(psinScalingCurve.Evaluate(t));
 			SetHaloValues(haloScalingCurve.Evaluate(t));
 			SetMaskValues(maskScalingCurve.Evaluate(t));
+			SetColliderValues(colliderScalingCurve.Evaluate(t));
 		}
 		else
 		{
@@ -170,6 +191,11 @@ public class PortalController : MonoBehaviour
 	private void SetMaskValues(float t)
 	{
 		mask.transform.localScale = Vector3.one * Mathf.Lerp(maskScaleRange.x, maskScaleRange.y, t);
+	}
+
+	private void SetColliderValues(float t)
+	{
+		portalCollider.radius = Mathf.Lerp(colliderScaleRange.x, colliderScaleRange.y, t);
 	}
 
 	public Sequence GetScalingSequence()

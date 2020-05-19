@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d4ca2c93a4ef014ab760cc447e62ac2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  touchScalingDuration: 4
+  touchScalingDuration: 5
   sequenceParams:
     psinTargetScale: 4
     psinScaleDuration: 3
@@ -311,6 +311,40 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   maskScaleRange: {x: 0, y: 4}
+  colliderScalingCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0014953613
+      value: 0.007598877
+      inSlope: 0.22028935
+      outSlope: 0.22028935
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.34244132
+      value: 0.083364464
+      inSlope: 0.7971814
+      outSlope: 0.7971814
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.0800357
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.393998
+      outSlope: 1.393998
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  colliderScaleRange: {x: 0.6, y: 1.5}
   psin: {fileID: 9096480246055842205}
   halo: {fileID: 6172636802912239185}
 --- !u!1001 &4896609564863207229

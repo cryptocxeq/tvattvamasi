@@ -43,10 +43,18 @@ public class IntroManager : MonoBehaviour
 	private void OnEnable()
 	{
 		inputController.onInputDown += OnInputDown;
-		logoDE.onDissolvedOut += OnLogoEnd;
-		introText1DE.onDissolvedOut += OnIntroText1End;
-		introText2DE.onDissolvedOut += OnIntroText2End;
-		introText3DE.onDissolvedOut += OnIntroText3End;
+
+		logoDE.onDissolvedOut += OnLogoDissolveOutEnd;
+		logoDE.onDissolvedIn += OnLogoDissolveInEnd;
+
+		introText1DE.onDissolvedOut += OnIntroText1DissolveOutEnd;
+		introText1DE.onDissolvedIn += OnIntroText1DissolveInEnd;
+
+		introText2DE.onDissolvedOut += OnIntroText2DissolveOutEnd;
+		introText2DE.onDissolvedIn += OnIntroText2DissolveInEnd;
+
+		introText3DE.onDissolvedOut += OnIntroText3DissolveOutEnd;
+		introText3DE.onDissolvedIn += OnIntroText3DissolveInEnd;
 
 		option1DE.GetComponent<OnColliderHit>().onHit += OnOption1Click;
 		option2DE.GetComponent<OnColliderHit>().onHit += OnOption2Click;
@@ -57,10 +65,18 @@ public class IntroManager : MonoBehaviour
 	private void OnDisable()
 	{
 		inputController.onInputDown -= OnInputDown;
-		logoDE.onDissolvedOut -= OnLogoEnd;
-		introText1DE.onDissolvedOut -= OnIntroText1End;
-		introText2DE.onDissolvedOut -= OnIntroText2End;
-		introText3DE.onDissolvedOut -= OnIntroText3End;
+
+		logoDE.onDissolvedOut -= OnLogoDissolveOutEnd;
+		logoDE.onDissolvedIn -= OnLogoDissolveInEnd;
+
+		introText1DE.onDissolvedOut -= OnIntroText1DissolveOutEnd;
+		introText1DE.onDissolvedIn -= OnIntroText1DissolveInEnd;
+
+		introText2DE.onDissolvedOut -= OnIntroText2DissolveOutEnd;
+		introText2DE.onDissolvedIn -= OnIntroText2DissolveInEnd;
+
+		introText3DE.onDissolvedOut -= OnIntroText3DissolveOutEnd;
+		introText3DE.onDissolvedIn -= OnIntroText3DissolveInEnd;
 
 		option1DE.GetComponent<OnColliderHit>().onHit -= OnOption1Click;
 		option2DE.GetComponent<OnColliderHit>().onHit -= OnOption2Click;
@@ -73,6 +89,7 @@ public class IntroManager : MonoBehaviour
 		HideIntro();
 		logoDE.GetComponent<ParticleSystem>().Play();
 		logoDE.DissolveIn();
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.LogoDissolveIn, 0.1f);
 		introState = IntroState.Logo;
 	}
 
@@ -88,6 +105,12 @@ public class IntroManager : MonoBehaviour
 		option2DE.SetHidden();
 		option3DE.SetHidden();
 		option4DE.SetHidden();
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoDissolveIn);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoDissolveOut);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoIdle);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveIn);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveOut);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextIdle);
 	}
 
 	private void OnInputDown(Vector3 inputPosition)
@@ -109,6 +132,8 @@ public class IntroManager : MonoBehaviour
 					ParticleSystem.EmissionModule em = ps.emission;
 					em.enabled = false;
 					logoDE.DissolveOut();
+					MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoIdle);
+					MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.LogoDissolveOut);
 				}
 				break;
 			}
@@ -119,19 +144,33 @@ public class IntroManager : MonoBehaviour
 			case IntroState.Text2:
 			{
 				if (!introText2DE.isDissolvingIn && !introText2DE.isDissolvingOut)
+				{
 					introText2DE.DissolveOut();
+					MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoIdle);
+					MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextDissolveOut);
+				}
 				break;
 			}
 			case IntroState.Text3:
 			{
 				if (!introText3DE.isDissolvingIn && !introText3DE.isDissolvingOut)
+				{
 					introText3DE.DissolveOut();
+					MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoIdle);
+					MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextDissolveOut);
+				}
 				break;
 			}
 		}
 	}
 
-	private void OnLogoEnd()
+	private void OnLogoDissolveInEnd()
+	{
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoDissolveIn);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.LogoIdle);
+	}
+
+	private void OnLogoDissolveOutEnd()
 	{
 		introText1DE.DissolveIn();
 		option1DE.DissolveIn(optionsDisplayInterval);
@@ -139,24 +178,48 @@ public class IntroManager : MonoBehaviour
 		option3DE.DissolveIn(optionsDisplayInterval * 3);
 		option4DE.DissolveIn(optionsDisplayInterval * 4);
 		introState = IntroState.Text1;
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.LogoDissolveOut);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextDissolveIn);
 	}
 
-	private void OnIntroText1End()
+	private void OnIntroText1DissolveInEnd()
+	{
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveIn);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextIdle);
+	}
+
+	private void OnIntroText1DissolveOutEnd()
 	{
 		introText2DE.DissolveIn();
 		introState = IntroState.Text2;
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextDissolveIn);
 	}
 
-	private void OnIntroText2End()
+	private void OnIntroText2DissolveInEnd()
+	{
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveIn);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.LogoIdle);
+	}
+
+	private void OnIntroText2DissolveOutEnd()
 	{
 		introText3DE.DissolveIn();
 		introState = IntroState.Text3;
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveOut);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TextDissolveIn);
 	}
 
-	private void OnIntroText3End()
+	private void OnIntroText3DissolveInEnd()
+	{
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveIn);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.LogoIdle);
+	}
+
+	private void OnIntroText3DissolveOutEnd()
 	{
 		introState = IntroState.Hidden;
 		MainApp.Instance.StartNewGame(selectedGameLength);
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextDissolveOut);
 	}
 
 	private void SelectGameLength(int duration)
@@ -167,6 +230,8 @@ public class IntroManager : MonoBehaviour
 		option2DE.DissolveOut();
 		option3DE.DissolveOut();
 		option4DE.DissolveOut();
+		MainApp.Instance.audioManager.StopAudio(AudioManager.AudioEventType.TextIdle);
+		MainApp.Instance.audioManager.PlayAudio(AudioManager.AudioEventType.TimeSelected);
 	}
 
 	private void OnOption1Click()

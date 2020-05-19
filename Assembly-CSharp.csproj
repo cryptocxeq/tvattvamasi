@@ -71,6 +71,7 @@
     <Compile Include="Assets\Alpha Masking\Samples\Scripts\ShipMover.cs" />
     <Compile Include="Assets\Alpha Masking\Samples\Scripts\UVAnimator.cs" />
     <Compile Include="Assets\Alpha Masking\UIMaterialModifier.cs" />
+    <Compile Include="Assets\Mandala\MandalaController.cs" />
     <Compile Include="Assets\Modules\BlendModes\Extensions\Components\UnityEngine.SpriteRenderer\SpriteRendererExtension.cs" />
     <Compile Include="Assets\Modules\BlendModes\Runtime\BlendMode.cs" />
     <Compile Include="Assets\Modules\BlendModes\Runtime\BlendModeEffect.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Assets\Scripts\App\TouchParticleController.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioManager.cs" />
     <Compile Include="Assets\Scripts\BackgroundController.cs" />
+    <Compile Include="Assets\Scripts\BackgroundControllerOld.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovingController.cs" />
     <Compile Include="Assets\Scripts\DebugController.cs" />
     <Compile Include="Assets\Scripts\InputController.cs" />
@@ -145,7 +147,6 @@
     <Compile Include="Assets\Shared\Scripts\SimpleCharacterMotor.cs" />
     <Compile Include="Assets\Text\DissolveEffect.cs" />
     <Compile Include="Assets\Text\TextController.cs" />
-    <Compile Include="Assets\mandala\MandalaController.cs" />
     <None Include="Assets\ParticleDistortTexture\Shaders\Particle_DistortTex_Scroll.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-Overlay.shader" />
     <None Include="Assets\Modules\BlendModes\Extensions\Shaders\SpritesDefault\BlendModes-SpritesDefault-Framebuffer.shader" />

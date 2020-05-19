@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 195527194550053604}
   - component: {fileID: 195527194550053605}
   m_Layer: 0
-  m_Name: MainBackground
+  m_Name: BackgroundTexture
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,57 +302,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09abedf63b35dd94b8546562fa9ec2c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generatorParams:
-    generateNebulas: 0
-    nebulaParams:
-      nebulaContent: {fileID: 195527195747540294}
-      nebulaPrefab: {fileID: 4712225675700263419, guid: c49a041e034e71840995a710d35b3e7b,
-        type: 3}
-      nebulaTextures: []
-      minQuantity: 0
-      maxQuantity: 0
-      minScale: 0
-      maxScale: 0
-      minPosition: {x: 0, y: 0}
-      maxPosition: {x: 0, y: 0}
-      nebulaMovementSpeed: 0.05
-    generateBackground: 1
-    backgroundParams:
-      backgroundRenderer: {fileID: 195527194550053605}
-      spaceMainMovementSpeed: 0.005
-    generateAudio: 1
-    audioParams:
-      audioSource: {fileID: 4145498644086467355}
-      audioClips:
-      - {fileID: 8300000, guid: ce9a76fce9658064ea50f7e00566eefc, type: 3}
-      audioFadeDuration: 3
-      audioFadeCurve:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 1
-          outSlope: 1
-          tangentMode: 34
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 1
-          tangentMode: 34
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
   starsContent: {fileID: 2586837785387111665}
   alphaTextures: {fileID: 1002268188019412760}
-  mask: {fileID: 195527194790068971}
+  audioSource: {fileID: 4145498644086467355}
+  backgroundRenderer: {fileID: 195527194550053605}
 --- !u!1 &195527195747540295
 GameObject:
   m_ObjectHideFlags: 0
@@ -746,7 +699,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

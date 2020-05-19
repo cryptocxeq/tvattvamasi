@@ -4,98 +4,165 @@ using UnityEngine;
 
 public class BackgroundManager : MonoBehaviour
 {
-	public BackgroundController bgFront;
-	public BackgroundController bgBack;
-	public Texture2D[] allBackgrounds;
-	[Tooltip("Starting background. Start with random background if null.")]
-	public Texture2D startingBackground;
-	[Tooltip("If false pick backgrounds in order of the array. If true pick backgrounds in random order.")]
-	public bool shuffleBackgroundsOrder = true;
-	public MandalaController[] allMandalas;
-	[Tooltip("If false pick mandalas in order of the array. If true pick mandalas in random order.")]
-	public bool shuffleMandalasOrder = true;
-
-	public Vector3 frontBackgroundPosition = new Vector3(0f, 0f, 0f);
-	public Vector3 backBackgroundPosition = new Vector3(0f, 0f, 10f);
-
-	public InputController inputController;
-	public bool showMandala;
-
-	private Queue<Texture2D> availableBackgrounds;
-	private Dictionary<int, Texture2D> allBackgroundsDictionary;
-	private int[] backgroundsKeys;
-	private bool firstSort = true;
-
-	private Queue<MandalaController> availableMandalas;
-	private int[] mandalaKeys;
-
-	private Texture2D getRandomBackground
+	public abstract class RandomObject<T> where T : Object
 	{
-		get
-		{
-			if (availableBackgrounds.Count <= 0)
-				RefreshBackgroundsPool();
-			return availableBackgrounds.Dequeue();
-		}
-	}
+		public T[] allObjects;
+		[Tooltip("Starting object. Start with random object if null.")]
+		public T startingObject;
+		[Tooltip("If false pick object in order of the array. If true pick object in random order.")]
+		public bool shuffleObjectsOrder = true;
 
-	private MandalaController getRandomMandala
-	{
-		get
-		{
-			if (availableMandalas.Count <= 0)
-				RefreshMandalasPool();
-			return availableMandalas.Dequeue();
-		}
-	}
+		private Queue<T> availableObjects;
+		private Dictionary<int, T> allObjectsDictionary;
+		private int[] objectsKeys;
+		private int startingObjectHash = -1;
+		private bool firstSort = true;
 
-	private int startingBackgroundHash = -1;
-	private bool dissolveMandalaTicket;
-
-	private void Awake()
-	{
-		allBackgroundsDictionary = new Dictionary<int, Texture2D>(allBackgrounds.Length);
-		backgroundsKeys = new int[allBackgrounds.Length];
-		for (int i = 0; i < allBackgrounds.Length; i++)
+		public T getRandomObject
 		{
-			int hashCode = allBackgrounds[i].GetHashCode();
-			backgroundsKeys[i] = hashCode;
-			if (!allBackgroundsDictionary.ContainsKey(hashCode))
+			get
 			{
-				allBackgroundsDictionary.Add(hashCode, allBackgrounds[i]);
+				if (availableObjects.Count <= 0)
+					RefreshObjectsPool();
+				return availableObjects.Dequeue();
+			}
+		}
+
+		public void Initialize()
+		{
+			startingObjectHash = -1;
+			firstSort = true;
+			allObjectsDictionary = new Dictionary<int, T>(allObjects.Length);
+			objectsKeys = new int[allObjects.Length];
+			for (int i = 0; i < allObjects.Length; i++)
+			{
+				int hashCode = allObjects[i].GetHashCode();
+				objectsKeys[i] = hashCode;
+				if (!allObjectsDictionary.ContainsKey(hashCode))
+				{
+					allObjectsDictionary.Add(hashCode, allObjects[i]);
+				}
+				else
+					Debug.LogError("Object duplication. " + allObjects[i].name + " - already exist in the array.", allObjects[i]);
+			}
+			availableObjects = new Queue<T>(allObjects.Length);
+			if (startingObject != null)
+				startingObjectHash = startingObject.GetHashCode();
+
+			RefreshObjectsPool();
+		}
+
+		private void RefreshObjectsPool()
+		{
+			if (shuffleObjectsOrder)
+			{
+				var shuffled = objectsKeys.OrderBy(a => MainApp.random.NextDouble());
+				if (firstSort)
+				{
+					foreach (var key in shuffled)
+					{
+						if (startingObject != null && key == startingObjectHash)
+						{
+							availableObjects.Enqueue(allObjectsDictionary[key]);
+							break;
+						}
+					}
+					foreach (var key in shuffled)
+					{
+						if ((startingObject != null && key == startingObjectHash) == false)
+							availableObjects.Enqueue(allObjectsDictionary[key]);
+					}
+				}
+				else
+				{
+					foreach (var key in shuffled)
+						availableObjects.Enqueue(allObjectsDictionary[key]);
+				}
 			}
 			else
-				Debug.LogError("Texture duplication. " + allBackgrounds[i].name + " - already in the array.", gameObject);
-		}
-		availableBackgrounds = new Queue<Texture2D>(allBackgrounds.Length);
-		if (startingBackground != null)
-			startingBackgroundHash = startingBackground.GetHashCode();
-		RefreshBackgroundsPool();
-
-		availableMandalas = new Queue<MandalaController>(allMandalas.Length);
-		mandalaKeys = new int[allMandalas.Length];
-		for (int i = 0; i < allMandalas.Length; i++)
-		{
-			allMandalas[i].gameObject.SetActive(false);
-			mandalaKeys[i] = i;
+			{
+				if (firstSort)
+				{
+					foreach (var bg in allObjectsDictionary)
+					{
+						if (startingObject != null && bg.Key == startingObjectHash)
+						{
+							availableObjects.Enqueue(bg.Value);
+							break;
+						}
+					}
+					foreach (var bg in allObjectsDictionary)
+					{
+						if ((startingObject != null && bg.Key == startingObjectHash) == false)
+							availableObjects.Enqueue(bg.Value);
+					}
+				}
+				else
+				{
+					foreach (var bg in allObjectsDictionary)
+						availableObjects.Enqueue(bg.Value);
+				}
+			}
+			firstSort = false;
 		}
 	}
+
+	[System.Serializable]
+	public class RandomBackground : RandomObject<Texture2D>
+	{
+	}
+
+	[System.Serializable]
+	public class RandomMandala : RandomObject<MandalaController>
+	{
+	}
+
+	[System.Serializable]
+	public class RandomMusic : RandomObject<AudioClip>
+	{
+	}
+
+	[Header("References")]
+	public BackgroundController bgFront;
+	public BackgroundController bgBack;
+	public InputController inputController;
+
+	[Header("Config")]
+	public RandomBackground backgrounds;
+	public RandomMandala mandalas;
+	public RandomMusic music;
+	public Vector3 frontBackgroundPosition = new Vector3(0f, 0f, 0f);
+	public Vector3 backBackgroundPosition = new Vector3(0f, 0f, 10f);
+	public float backgroundMovementSpeed = 0.005f;
+	public float musicFadeDuration = 3f;
+	public AnimationCurve musicFadeCurve;
+	public bool playMusic = true;
+	public bool showMandala = false;
+
+	private bool dissolveMandalaTicket = false;
 
 	private void Start()
 	{
-		bgFront.transform.localPosition = frontBackgroundPosition;
-		bgFront.InitializeAsFront();
-		bgFront.FadeAudioIn();
-		if (startingBackground != null)
-			bgFront.SetBackground(startingBackground);
-		else
-			bgFront.SetBackground(getRandomBackground);
+		backgrounds.Initialize();
+		mandalas.Initialize();
+		music.Initialize();
 
-		bgBack.transform.localPosition = backBackgroundPosition;
-		bgBack.SetBackground(getRandomBackground);
+		dissolveMandalaTicket = false;
+
+		for (int i = 0; i < mandalas.allObjects.Length; i++)
+			mandalas.allObjects[i].gameObject.SetActive(false);
+
+		bgFront.InitializeAsFront(frontBackgroundPosition);
+		bgFront.SetBackground(backgrounds.getRandomObject, backgroundMovementSpeed);
+		bgFront.SetMusic(music.getRandomObject, musicFadeCurve, musicFadeDuration);
+		if (playMusic)
+			bgFront.FadeAudioIn();
+
+		bgBack.InitializeAsBack(backBackgroundPosition);
+		bgBack.SetBackground(backgrounds.getRandomObject, backgroundMovementSpeed);
+		bgBack.SetMusic(music.getRandomObject, musicFadeCurve, musicFadeDuration);
 		if (showMandala)
-			bgBack.SetMandala(getRandomMandala);
-		bgBack.InitializeAsBack();
+			bgBack.SetMandala(mandalas.getRandomObject);
 	}
 
 	private void OnEnable()
@@ -118,72 +185,27 @@ public class BackgroundManager : MonoBehaviour
 		}
 	}
 
-	private void RefreshBackgroundsPool()
-	{
-		if (shuffleBackgroundsOrder)
-		{
-			var shuffled = backgroundsKeys.OrderBy(a => MainApp.random.NextDouble());
-			foreach (var key in shuffled)
-			{
-				if ((firstSort && startingBackground != null && key == startingBackgroundHash) == false)
-					availableBackgrounds.Enqueue(allBackgroundsDictionary[key]);
-			}
-		}
-		else
-		{
-			foreach (var bg in allBackgroundsDictionary)
-			{
-				if ((firstSort && startingBackground != null && bg.Key == startingBackgroundHash) == false)
-					availableBackgrounds.Enqueue(bg.Value);
-			}
-		}
-		firstSort = false;
-	}
-
-	private void RefreshMandalasPool()
-	{
-		if (shuffleMandalasOrder)
-		{
-			var shuffled = mandalaKeys.OrderBy(a => MainApp.random.NextDouble());
-			foreach (var key in shuffled)
-				availableMandalas.Enqueue(allMandalas[key]);
-		}
-		else
-		{
-			for (int i = 0; i < allMandalas.Length; i++)
-				availableMandalas.Enqueue(allMandalas[i]);
-		}
-	}
-
 	public void OnSwitchBackgroundsStart()
 	{
-		bgBack.FadeAudioIn();
+		if (playMusic)
+			bgBack.FadeAudioIn();
 		bgFront.FadeAudioOut();
 	}
 
 	public void OnSwitchBackgroundsEnd()
 	{
-		bgBack.transform.localPosition = frontBackgroundPosition;
-		bgFront.transform.localPosition = backBackgroundPosition;
+		bgBack.InitializeAsFront(frontBackgroundPosition);
 
-		bgFront.SetBackground(getRandomBackground);
+		bgFront.InitializeAsBack(backBackgroundPosition);
+		bgFront.SetBackground(backgrounds.getRandomObject, backgroundMovementSpeed);
+		bgFront.SetMusic(music.getRandomObject, musicFadeCurve, musicFadeDuration);
 		if (showMandala)
-			bgFront.SetMandala(getRandomMandala);
-
-		bgBack.InitializeAsFront();
-		bgFront.InitializeAsBack();
-		bgFront.Randomize();
+			bgFront.SetMandala(mandalas.getRandomObject);
 
 		BackgroundController tmp = bgFront;
 		bgFront = bgBack;
 		bgBack = tmp;
 
 		dissolveMandalaTicket = true;
-	}
-
-	public void SetRenderTexture(RenderTexture rt)
-	{
-		bgFront.mask.MainTex = rt;
-		bgBack.mask.MainTex = rt;
 	}
 }

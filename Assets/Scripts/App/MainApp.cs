@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Diagnostics;
+using DG.Tweening;
 
 public class MainApp : TGlobalSingleton<MainApp>
 {
@@ -7,7 +8,9 @@ public class MainApp : TGlobalSingleton<MainApp>
 	public int gameLengthOption2 = 10;
 	public int gameLengthOption3 = 15;
 	public int gameLengthOption4 = 30;
-	public float renderTextureResolutionMultiplier = 1;
+	//public float renderTextureResolutionMultiplier = 1;
+	public float pauseTimescale = 0.05f;
+	public float pauseDuration = 1f;
 
 	public AudioManager audioManager;
 	public PortalGenerator portalGenerator;
@@ -15,18 +18,18 @@ public class MainApp : TGlobalSingleton<MainApp>
 	public IntroManager introManager;
 	public MainUIController uiController;
 
-	private Stopwatch stopwatch = new Stopwatch();
-	private int elapsedTime;
+	private float elapsedTime;
 	private bool isInfinite;
+	private bool isGameRunning;
 
 	public static readonly System.Random random = new System.Random();
 
-	public int currentGameLength
+	public float currentGameLength
 	{
 		get; private set;
 	}
 
-	public int timeleft
+	public float timeleft
 	{
 		get
 		{
@@ -41,11 +44,11 @@ public class MainApp : TGlobalSingleton<MainApp>
 
 	private void Update()
 	{
-		if (stopwatch.IsRunning)
+		if (isGameRunning)
 		{
-			elapsedTime = (int)stopwatch.Elapsed.TotalSeconds;
+			elapsedTime += Time.deltaTime;
 
-			if (!isInfinite && stopwatch.Elapsed.TotalSeconds > currentGameLength)
+			if (!isInfinite && elapsedTime > currentGameLength)
 			{
 				EndGame();
 			}
@@ -65,8 +68,8 @@ public class MainApp : TGlobalSingleton<MainApp>
 	{
 		ResumeGame();
 		isInfinite = false;
-		stopwatch.Reset();
-		stopwatch.Start();
+		isGameRunning = true;
+		elapsedTime = 0f;
 		currentGameLength = duration * 60;
 		portalGenerator.RemovePortals();
 		portalGenerator.StopGeneratingPortals();
@@ -79,7 +82,6 @@ public class MainApp : TGlobalSingleton<MainApp>
 	{
 		currentGameLength = int.MaxValue;
 		isInfinite = true;
-		stopwatch.Start();
 		portalGenerator.ResumeGeneratingPortals();
 		uiController.HideUI();
 		uiController.ShowPauseButton();
@@ -87,7 +89,7 @@ public class MainApp : TGlobalSingleton<MainApp>
 
 	public void EndGame()
 	{
-		stopwatch.Stop();
+		isGameRunning = false;
 		portalGenerator.StopGeneratingPortals();
 		uiController.HideUI();
 		uiController.ShowEndScreen();
@@ -95,11 +97,11 @@ public class MainApp : TGlobalSingleton<MainApp>
 
 	public void PauseGame()
 	{
-		Time.timeScale = 0f;
+		DOTween.To(() => Time.timeScale, x => Time.timeScale = x, pauseTimescale, pauseDuration);
 	}
 
 	public void ResumeGame()
 	{
-		Time.timeScale = 1f;
+		DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, pauseDuration);
 	}
 }

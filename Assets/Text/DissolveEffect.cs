@@ -55,6 +55,7 @@ public class DissolveEffect : MonoBehaviour
 	}
 
 	public System.Action onDissolvedOut = () => { };
+	public System.Action onDissolvedIn = () => { };
 
 	private void Awake()
 	{
@@ -126,6 +127,7 @@ public class DissolveEffect : MonoBehaviour
 		if (collider2DComp != null)
 			collider2DComp.enabled = true;
 		SetIdleParticles();
+		onDissolvedIn.Invoke();
 	}
 
 	public void OnDissolveOutEnd()
@@ -135,9 +137,9 @@ public class DissolveEffect : MonoBehaviour
 		spriteRenderer.enabled = false;
 		if (collider2DComp != null)
 			collider2DComp.enabled = false;
-		onDissolvedOut.Invoke();
 		if (currentOutParticles != null)
 			currentOutParticles.Stop();
+		onDissolvedOut.Invoke();
 	}
 
 	public void OnDissolveOutTriggerIn()
